@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مبدل کانفیگ </title>
+    <title>مبدل کانفیگ</title>
     <style>
         :root {
             --primary-color: #9c7bd5;
@@ -401,7 +401,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔄 مبدل کانفیگ به jSoN</h1>
+        <h1>🔄 مبدل کانفیگ به JSON</h1>
         
         <div id="alertContainer"></div>
 
@@ -424,12 +424,12 @@
 
         <div class="form-group">
             <label for="inboundName">نام اینباند :</label>
-            <input type="text" id="inboundName" placeholder="مثال: VLESS+TCP+NONE+8080">
+            <input type="text" id="inboundName" placeholder="مثال: ارمنستان یا VLESS+TCP+NONE+8080">
         </div>
 
         <div class="form-group">
             <label for="marzbanJson">JSON کد :</label>
-            <textarea id="marzbanJson" placeholder="کد JSON  را اینجا وارد کنید..."></textarea>
+            <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
         </div>
 
         <div class="form-group">
@@ -448,7 +448,7 @@
         </div>
 
         <footer>
-            <p>    ساخته شده توسط ai 🤖  </p>
+            <p>ساخته شده توسط AI 🤖</p>
         </footer>
     </div>
 
@@ -476,7 +476,7 @@
             }, 5000);
         }
 
-        function parseVlessConfig(configStr) {
+        function parseVlessConfig(configStr, customTag) {
             try {
                 if (configStr.startsWith('vless://')) {
                     const url = new URL(configStr);
@@ -484,15 +484,6 @@
                     const address = url.hostname;
                     const port = parseInt(url.port);
                     const params = new URLSearchParams(url.search);
-                    
-                    let tagName = "VLESS Config";
-                    if (url.hash) {
-                        try {
-                            tagName = decodeURIComponent(url.hash.substring(1));
-                        } catch (e) {
-                            tagName = url.hash.substring(1);
-                        }
-                    }
                     
                     const network = params.get('type') || "tcp";
                     const security = params.get('security') || "none";
@@ -592,18 +583,20 @@
                                 }
                             ]
                         },
-                        tag: tagName,
+                        tag: customTag,
                         streamSettings: streamSettings
                     };
                 }
                 
-                return JSON.parse(configStr);
+                const parsed = JSON.parse(configStr);
+                parsed.tag = customTag;
+                return parsed;
             } catch (error) {
                 throw new Error('فرمت کانفیگ VLESS نامعتبر است: ' + error.message);
             }
         }
 
-        function parseVmessConfig(configStr) {
+        function parseVmessConfig(configStr, customTag) {
             try {
                 if (configStr.startsWith('vmess://')) {
                     const base64Data = configStr.replace('vmess://', '');
@@ -687,12 +680,14 @@
                                 }
                             ]
                         },
-                        tag: vmessData.ps || "VMess Config",
+                        tag: customTag,
                         streamSettings: streamSettings
                     };
                 }
                 
-                return JSON.parse(configStr);
+                const parsed = JSON.parse(configStr);
+                parsed.tag = customTag;
+                return parsed;
             } catch (error) {
                 throw new Error('فرمت کانفیگ VMess نامعتبر است: ' + error.message);
             }
@@ -723,20 +718,20 @@
 
                 const marzbanConfig = JSON.parse(marzbanJsonStr);
                 
-                let parsedConfig;
-                if (currentProtocol === 'vless') {
-                    parsedConfig = parseVlessConfig(configStr);
-                } else if (currentProtocol === 'vmess') {
-                    parsedConfig = parseVmessConfig(configStr);
-                }
-
                 if (!marzbanConfig.outbounds) {
                     marzbanConfig.outbounds = [];
                 }
                 
-                const existingTags = marzbanConfig.outbounds.map(ob => ob.tag);
+                const existingTags = marzbanConfig.outbounds.map(ob => ob.tag || '');
                 
-                parsedConfig.tag = generateUniqueTag(parsedConfig.tag, existingTags);
+                const uniqueTag = generateUniqueTag(inboundName, existingTags);
+                
+                let parsedConfig;
+                if (currentProtocol === 'vless') {
+                    parsedConfig = parseVlessConfig(configStr, uniqueTag);
+                } else if (currentProtocol === 'vmess') {
+                    parsedConfig = parseVmessConfig(configStr, uniqueTag);
+                }
                 
                 marzbanConfig.outbounds.push(parsedConfig);
 
@@ -792,11 +787,24 @@
 
         function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
-            element.select();
-            document.execCommand('copy');
-            showAlert('✅ کپی شد!', 'success');
-        }
+            const text = element.value;
 
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showAlert('✅ کپی شد!', 'success');
+                }).catch(err => {
+                    showAlert('❌ خطا در کپی کردن: ' + err.message, 'danger');
+                });
+            } else {
+                element.select();
+                try {
+                    document.execCommand('copy');
+                    showAlert('✅ کپی شد!', 'success');
+                } catch (err) {
+                    showAlert('❌ خطا در کپی کردن: ' + err.message, 'danger');
+                }
+            }
+        }
     </script>
 </body>
 </html>
