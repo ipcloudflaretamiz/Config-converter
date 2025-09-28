@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مبدل کانفیگ </title>
+    <style>
+        :root {
+            --primary-color: #9c7bd5;
+            --primary-light: #c4a7e7;
+            --primary-dark: #7c5fb5;
+            --background-dark: #0a0a0f;
+            --surface-dark: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --error-color: #cf6679;
+            --success-color: #03dac6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Vazirmatn", "Tahoma", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--text-primary);
+            direction: rtl;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(156, 123, 213, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(124, 95, 181, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(196, 167, 231, 0.08) 0%, transparent 30%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            border-radius: 24px;
+            background: rgba(26, 26, 46, 0.25);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 8px 32px rgba(156, 123, 213, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        h1 {
+            color: var(--primary-light);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 10px rgba(156, 123, 213, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            resize: vertical;
+            box-shadow: 
+                inset 0 2px 8px rgba(0, 0, 0, 0.1),
+                0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: monospace;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 
+                0 0 0 3px rgba(196, 167, 231, 0.2),
+                0 8px 32px rgba(156, 123, 213, 0.15),
+                inset 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input[type="text"]::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .protocol-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .protocol-btn {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1rem 1.2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .protocol-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .protocol-btn:hover::before {
+            left: 100%;
+        }
+
+        .protocol-btn.active {
+            background: rgba(156, 123, 213, 0.2);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 
+                0 8px 32px rgba(156, 123, 213, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .protocol-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block;
+            width: 100%;
+            margin-top: 1rem;
+            box-shadow: 
+                0 8px 32px rgba(156, 123, 213, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #6a4c93);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 40px rgba(156, 123, 213, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        button:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-danger {
+            background: rgba(207, 102, 121, 0.15);
+            border-right: 4px solid var(--error-color);
+            color: var(--error-color);
+            box-shadow: 
+                0 8px 32px rgba(207, 102, 121, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-success {
+            background: rgba(3, 218, 198, 0.15);
+            border-right: 4px solid var(--success-color);
+            color: var(--success-color);
+            box-shadow: 
+                0 8px 32px rgba(3, 218, 198, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .alert-info {
+            background: rgba(196, 167, 231, 0.15);
+            border-right: 4px solid var(--primary-light);
+            color: var(--primary-light);
+            box-shadow: 
+                0 8px 32px rgba(196, 167, 231, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .output-section {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .output-section.show {
+            display: block;
+        }
+
+        .copy-btn {
+            display: inline-block;
+            width: auto;
+            padding: 0.8rem 1.5rem;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: rgba(196, 167, 231, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(196, 167, 231, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            box-shadow: 
+                0 8px 32px rgba(196, 167, 231, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .info-box ul {
+            margin-right: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .info-box li {
+            margin-bottom: 0.3rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 2rem;
+                border-radius: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2") format("woff2");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Bold.woff2") format("woff2");
+            font-weight: bold;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 مبدل کانفیگ به jSoN</h1>
+        
+        <div id="alertContainer"></div>
+
+        <div class="info-box">
+            <strong>📌 پشتیبانی کامل از:</strong>
+            <ul>
+                <li>✅ پروتکل‌های VLESS و VMess</li>
+                <li>✅ انواع شبکه: TCP, WS, gRPC, H2, xHTTP</li>
+                <li>✅ Path, Host, SNI و سایر پارامترها</li>
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <label>نوع پروتکل 📶</label>
+            <div class="protocol-buttons">
+                <button type="button" class="protocol-btn active" onclick="selectProtocol('vless', this)">VLESS</button>
+                <button type="button" class="protocol-btn" onclick="selectProtocol('vmess', this)">VMess</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inboundName">نام اینباند :</label>
+            <input type="text" id="inboundName" placeholder="مثال: VLESS+TCP+NONE+8080">
+        </div>
+
+        <div class="form-group">
+            <label for="marzbanJson">JSON کد :</label>
+            <textarea id="marzbanJson" placeholder="کد JSON  را اینجا وارد کنید..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="configInput">کانفیگ مورد نظر :</label>
+            <textarea id="configInput" placeholder="کانفیگ خود را اینجا وارد کنید..."></textarea>
+        </div>
+
+        <button onclick="convertConfig()">🔄 تبدیل کانفیگ</button>
+
+        <div class="output-section" id="outputSection">
+            <div class="form-group">
+                <label>JSON نهایی :</label>
+                <textarea id="finalOutput" readonly></textarea>
+                <button class="copy-btn" onclick="copyToClipboard('finalOutput')">📋 کپی</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>    ساخته شده توسط ai 🤖  </p>
+        </footer>
+    </div>
+
+    <script>
+        let currentProtocol = 'vless';
+
+        function selectProtocol(protocol, element) {
+            currentProtocol = protocol;
+            document.querySelectorAll('.protocol-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
+            document.getElementById('configInput').value = '';
+            const placeholderText = {
+                'vless': 'کانفیگ VLESS را اینجا وارد کنید...',
+                'vmess': 'کانفیگ VMess را اینجا وارد کنید...'
+            };
+            document.getElementById('configInput').placeholder = placeholderText[protocol];
+        }
+
+        function showAlert(message, type = 'danger') {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        function parseVlessConfig(configStr) {
+            try {
+                if (configStr.startsWith('vless://')) {
+                    const url = new URL(configStr);
+                    const id = url.username;
+                    const address = url.hostname;
+                    const port = parseInt(url.port);
+                    const params = new URLSearchParams(url.search);
+                    
+                    let tagName = "VLESS Config";
+                    if (url.hash) {
+                        try {
+                            tagName = decodeURIComponent(url.hash.substring(1));
+                        } catch (e) {
+                            tagName = url.hash.substring(1);
+                        }
+                    }
+                    
+                    const network = params.get('type') || "tcp";
+                    const security = params.get('security') || "none";
+                    const headerType = params.get('headerType') || "none";
+                    const host = params.get('host') || "";
+                    const path = params.get('path') || "/";
+                    const sni = params.get('sni') || "";
+                    const alpn = params.get('alpn') || "";
+                    const fp = params.get('fp') || "";
+                    const pbk = params.get('pbk') || "";
+                    const sid = params.get('sid') || "";
+                    const serviceName = params.get('serviceName') || "";
+                    
+                    let streamSettings = {
+                        network: network,
+                        security: security
+                    };
+                    
+                    if (network === "tcp") {
+                        streamSettings.tcpSettings = {
+                            header: {
+                                type: headerType
+                            }
+                        };
+                        
+                        if (headerType === "http" && host) {
+                            streamSettings.tcpSettings.header.request = {
+                                headers: {
+                                    Host: [host]
+                                },
+                                path: [path]
+                            };
+                        }
+                    }
+                    
+                    else if (network === "ws") {
+                        streamSettings.wsSettings = {
+                            path: path || "/",
+                            headers: {}
+                        };
+                        if (host) {
+                            streamSettings.wsSettings.headers.Host = host;
+                        }
+                    }
+                    
+                    else if (network === "grpc") {
+                        streamSettings.grpcSettings = {
+                            serviceName: serviceName || ""
+                        };
+                    }
+                    
+                    else if (network === "h2") {
+                        streamSettings.httpSettings = {
+                            path: path || "/",
+                            host: host ? [host] : []
+                        };
+                    }
+                    
+                    else if (network === "xhttp") {
+                        streamSettings.xhttpSettings = {
+                            path: path || "/",
+                            host: host || ""
+                        };
+                    }
+                    
+                    if (security === "tls") {
+                        streamSettings.tlsSettings = {
+                            serverName: sni || address,
+                            alpn: alpn ? alpn.split(',') : [],
+                            fingerprint: fp || ""
+                        };
+                    }
+                    
+                    else if (security === "reality") {
+                        streamSettings.realitySettings = {
+                            serverName: sni || "",
+                            fingerprint: fp || "chrome",
+                            shortId: sid || "",
+                            publicKey: pbk || ""
+                        };
+                    }
+                    
+                    return {
+                        protocol: "vless",
+                        settings: {
+                            vnext: [
+                                {
+                                    address: address,
+                                    port: port,
+                                    users: [
+                                        {
+                                            id: id,
+                                            flow: params.get('flow') || "",
+                                            encryption: params.get('encryption') || "none"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        tag: tagName,
+                        streamSettings: streamSettings
+                    };
+                }
+                
+                return JSON.parse(configStr);
+            } catch (error) {
+                throw new Error('فرمت کانفیگ VLESS نامعتبر است: ' + error.message);
+            }
+        }
+
+        function parseVmessConfig(configStr) {
+            try {
+                if (configStr.startsWith('vmess://')) {
+                    const base64Data = configStr.replace('vmess://', '');
+                    const decodedData = atob(base64Data);
+                    const vmessData = JSON.parse(decodedData);
+                    
+                    let streamSettings = {
+                        network: vmessData.net || "tcp",
+                        security: vmessData.tls || "none"
+                    };
+                    
+                    if (streamSettings.network === "tcp") {
+                        streamSettings.tcpSettings = {
+                            header: {
+                                type: vmessData.type || "none"
+                            }
+                        };
+                        
+                        if (vmessData.type === "http" && vmessData.host) {
+                            streamSettings.tcpSettings.header.request = {
+                                headers: {
+                                    Host: [vmessData.host]
+                                },
+                                path: [vmessData.path || "/"]
+                            };
+                        }
+                    }
+                    
+                    else if (streamSettings.network === "ws") {
+                        streamSettings.wsSettings = {
+                            path: vmessData.path || "/",
+                            headers: {}
+                        };
+                        if (vmessData.host) {
+                            streamSettings.wsSettings.headers.Host = vmessData.host;
+                        }
+                    }
+                    
+                    else if (streamSettings.network === "grpc") {
+                        streamSettings.grpcSettings = {
+                            serviceName: vmessData.path || ""
+                        };
+                    }
+                    
+                    else if (streamSettings.network === "h2") {
+                        streamSettings.httpSettings = {
+                            path: vmessData.path || "/",
+                            host: vmessData.host ? [vmessData.host] : []
+                        };
+                    }
+                    
+                    else if (streamSettings.network === "xhttp") {
+                        streamSettings.xhttpSettings = {
+                            path: vmessData.path || "/",
+                            host: vmessData.host || ""
+                        };
+                    }
+                    
+                    if (streamSettings.security === "tls") {
+                        streamSettings.tlsSettings = {
+                            serverName: vmessData.sni || vmessData.add || "",
+                            alpn: vmessData.alpn ? vmessData.alpn.split(',') : [],
+                            fingerprint: vmessData.fp || ""
+                        };
+                    }
+                    
+                    return {
+                        protocol: "vmess",
+                        settings: {
+                            vnext: [
+                                {
+                                    address: vmessData.add,
+                                    port: parseInt(vmessData.port),
+                                    users: [
+                                        {
+                                            id: vmessData.id,
+                                            alterId: parseInt(vmessData.aid) || 0,
+                                            security: vmessData.scy || "auto"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        tag: vmessData.ps || "VMess Config",
+                        streamSettings: streamSettings
+                    };
+                }
+                
+                return JSON.parse(configStr);
+            } catch (error) {
+                throw new Error('فرمت کانفیگ VMess نامعتبر است: ' + error.message);
+            }
+        }
+
+        function generateUniqueTag(baseTag, existingTags) {
+            let tag = baseTag;
+            let counter = 1;
+            
+            while (existingTags.includes(tag)) {
+                tag = `${baseTag}_${counter}`;
+                counter++;
+            }
+            
+            return tag;
+        }
+
+        function convertConfig() {
+            try {
+                const inboundName = document.getElementById('inboundName').value.trim();
+                const marzbanJsonStr = document.getElementById('marzbanJson').value.trim();
+                const configStr = document.getElementById('configInput').value.trim();
+
+                if (!inboundName || !marzbanJsonStr || !configStr) {
+                    showAlert('لطفاً تمام فیلدها را پر کنید');
+                    return;
+                }
+
+                const marzbanConfig = JSON.parse(marzbanJsonStr);
+                
+                let parsedConfig;
+                if (currentProtocol === 'vless') {
+                    parsedConfig = parseVlessConfig(configStr);
+                } else if (currentProtocol === 'vmess') {
+                    parsedConfig = parseVmessConfig(configStr);
+                }
+
+                if (!marzbanConfig.outbounds) {
+                    marzbanConfig.outbounds = [];
+                }
+                
+                const existingTags = marzbanConfig.outbounds.map(ob => ob.tag);
+                
+                parsedConfig.tag = generateUniqueTag(parsedConfig.tag, existingTags);
+                
+                marzbanConfig.outbounds.push(parsedConfig);
+
+                if (!marzbanConfig.routing) {
+                    marzbanConfig.routing = { rules: [] };
+                }
+                
+                if (!marzbanConfig.routing.rules) {
+                    marzbanConfig.routing.rules = [];
+                }
+                
+                const existingRuleIndex = marzbanConfig.routing.rules.findIndex(
+                    rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
+                );
+                
+                if (existingRuleIndex !== -1) {
+                    marzbanConfig.routing.rules[existingRuleIndex] = {
+                        type: "field",
+                        inboundTag: [inboundName],
+                        outboundTag: parsedConfig.tag
+                    };
+                } else {
+                    marzbanConfig.routing.rules.push({
+                        type: "field",
+                        inboundTag: [inboundName],
+                        outboundTag: parsedConfig.tag
+                    });
+                }
+
+                document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
+                document.getElementById('outputSection').classList.add('show');
+                
+                let successMsg = `✅ کانفیگ با موفقیت تبدیل شد!<br>`;
+                successMsg += `📌 پروتکل: ${parsedConfig.protocol.toUpperCase()}<br>`;
+                successMsg += `🌐 شبکه: ${parsedConfig.streamSettings.network}<br>`;
+                successMsg += `🔒 امنیت: ${parsedConfig.streamSettings.security}<br>`;
+                if (parsedConfig.streamSettings.wsSettings?.path) {
+                    successMsg += `📁 Path: ${parsedConfig.streamSettings.wsSettings.path}<br>`;
+                } else if (parsedConfig.streamSettings.xhttpSettings?.path) {
+                    successMsg += `📁 Path: ${parsedConfig.streamSettings.xhttpSettings.path}<br>`;
+                } else if (parsedConfig.streamSettings.grpcSettings?.serviceName) {
+                    successMsg += `📁 ServiceName: ${parsedConfig.streamSettings.grpcSettings.serviceName}<br>`;
+                }
+                successMsg += `🏷️ Tag: ${parsedConfig.tag}`;
+                
+                showAlert(successMsg, 'success');
+
+            } catch (error) {
+                showAlert('❌ خطا در تبدیل کانفیگ: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            showAlert('✅ کپی شد!', 'success');
+        }
+
+    </script>
+</body>
+</html>
