@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مبدل کانفیگ به JSON</title>
+    <title>مبدل کانفیگ</title>
     <style>
         :root {
             --primary-color: #6366f1;
@@ -11,20 +11,19 @@
             --primary-dark: #4f46e5;
             --background-dark: #0f172a;
             --surface-dark: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
             --error-color: #ef4444;
             --success-color: #10b981;
-            --info-color: #3b82f6;
-            --glass-bg: rgba(30, 41, 59, 0.4);
-            --glass-border: rgba(148, 163, 184, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+            font-family: "Vazirmatn", "Tahoma", sans-serif;
         }
 
         body {
@@ -39,7 +38,7 @@
             background-attachment: fixed;
             position: relative;
             overflow-x: hidden;
-            padding: 1rem;
+            padding: 2rem 0;
         }
 
         body::before {
@@ -50,215 +49,156 @@
             width: 100%;
             height: 100%;
             background-image: 
-                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(79, 70, 229, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 40% 80%, rgba(129, 140, 248, 0.1) 0%, transparent 40%);
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(79, 70, 229, 0.12) 0%, transparent 40%);
             pointer-events: none;
-            z-index: 0;
+            z-index: -1;
         }
 
         .container {
-            width: 100%;
+            width: 90%;
             max-width: 900px;
-            margin: 2rem auto;
+            margin: 0 auto;
             padding: 3rem;
-            border-radius: 32px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(60px) saturate(180%);
-            -webkit-backdrop-filter: blur(60px) saturate(180%);
+            border-radius: 24px;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
             box-shadow: 
-                0 25px 80px rgba(0, 0, 0, 0.6),
-                0 10px 40px rgba(99, 102, 241, 0.15),
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 8px 32px rgba(99, 102, 241, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(148, 163, 184, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             position: relative;
             overflow: hidden;
-            z-index: 1;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
-        }
-
-        .container::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
-            pointer-events: none;
         }
 
         h1 {
             color: var(--primary-light);
             text-align: center;
             margin-bottom: 2.5rem;
-            font-size: 2.2rem;
-            font-weight: 700;
-            text-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-            position: relative;
-            z-index: 2;
+            font-size: 2rem;
+            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        /* Alert Container - Centered on Page */
-        #alertContainer {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
-            width: 90%;
-            max-width: 600px;
-            pointer-events: none;
-        }
-
-        #alertContainer > * {
-            pointer-events: auto;
-        }
-
-        .alert {
-            padding: 1.5rem 2rem;
-            border-radius: 20px;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                0 10px 40px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 1.05rem;
-            font-weight: 500;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.25);
-            border-right: 5px solid var(--error-color);
-            color: #fecaca;
-            box-shadow: 
-                0 20px 60px rgba(239, 68, 68, 0.4),
-                0 10px 40px rgba(239, 68, 68, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.25);
-            border-right: 5px solid var(--success-color);
-            color: #a7f3d0;
-            box-shadow: 
-                0 20px 60px rgba(16, 185, 129, 0.4),
-                0 10px 40px rgba(16, 185, 129, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .alert-info {
-            background: rgba(59, 130, 246, 0.25);
-            border-right: 5px solid var(--info-color);
-            color: #bfdbfe;
-            box-shadow: 
-                0 20px 60px rgba(59, 130, 246, 0.4),
-                0 10px 40px rgba(59, 130, 246, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 1.2rem 1.5rem;
-            border-radius: 18px;
-            border: 1px solid rgba(148, 163, 184, 0.15);
-            background: rgba(15, 23, 42, 0.4);
+        .info-box {
+            background: rgba(99, 102, 241, 0.1);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            resize: vertical;
-            box-shadow: 
-                inset 0 2px 10px rgba(0, 0, 0, 0.2),
-                0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
         }
 
-        textarea {
-            min-height: 160px;
-            font-family: "Courier New", monospace;
-            line-height: 1.5;
+        .info-box strong {
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
         }
 
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            background: rgba(15, 23, 42, 0.6);
-            box-shadow: 
-                0 0 0 4px rgba(99, 102, 241, 0.15),
-                0 10px 40px rgba(99, 102, 241, 0.2),
-                inset 0 2px 10px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
+        .info-box ul {
+            margin-right: 1.5rem;
+            color: var(--text-secondary);
         }
 
-        input[type="text"]::placeholder, textarea::placeholder {
-            color: rgba(203, 213, 225, 0.4);
+        .info-box li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .step-container {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .step-container.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            max-height: 1000px;
+        }
+
+        .step-container.completed {
+            opacity: 0.6;
+            max-height: 1000px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.2);
+            border: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-light);
+            transition: all 0.3s ease;
+        }
+
+        .step-container.completed .step-number {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .step-container.completed .step-number::before {
+            content: '✓';
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .protocol-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
-            margin-bottom: 1rem;
         }
 
         .protocol-btn {
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             color: var(--text-secondary);
-            border: 1px solid rgba(148, 163, 184, 0.15);
-            padding: 1.2rem 1.5rem;
-            border-radius: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
             cursor: pointer;
-            font-size: 1.05rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: bold;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 
-                0 4px 20px rgba(0, 0, 0, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         .protocol-btn::before {
@@ -269,7 +209,7 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s ease;
+            transition: left 0.6s ease;
         }
 
         .protocol-btn:hover::before {
@@ -277,47 +217,70 @@
         }
 
         .protocol-btn.active {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(79, 70, 229, 0.3));
+            background: rgba(99, 102, 241, 0.3);
             color: white;
             border-color: var(--primary-color);
-            box-shadow: 
-                0 10px 40px rgba(99, 102, 241, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
             transform: translateY(-2px);
         }
 
         .protocol-btn:hover:not(.active) {
-            background: rgba(15, 23, 42, 0.6);
-            border-color: rgba(148, 163, 184, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
-        button {
+        .input-group {
+            margin-top: 1rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 1.2rem;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        input[type="text"]::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .next-btn {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
             border: none;
-            padding: 1.3rem 2.5rem;
-            border-radius: 18px;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: block;
-            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
             margin-top: 1.5rem;
-            box-shadow: 
-                0 10px 40px rgba(99, 102, 241, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
             position: relative;
             overflow: hidden;
-            z-index: 2;
         }
 
-        button::before {
+        .next-btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -325,43 +288,86 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
+            transition: left 0.6s ease;
         }
 
-        button:hover::before {
+        .next-btn:hover::before {
             left: 100%;
         }
 
-        button:hover {
-            background: linear-gradient(135deg, var(--primary-dark), #3730a3);
-            transform: translateY(-4px);
-            box-shadow: 
-                0 15px 50px rgba(99, 102, 241, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        button:active {
+        .next-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
         }
 
-        button:disabled {
-            background: rgba(71, 85, 105, 0.3);
-            color: var(--text-secondary);
+        .next-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
+        .convert-btn {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.1rem;
+        }
+
+        .alert {
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin: 0 1rem 1rem 0;
+            backdrop-filter: blur(20px);
+            border: 1px solid;
+            animation: slideIn 0.5s ease;
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            transform: none;
+            z-index: 1000;
+            min-width: 250px;
+            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--error-color);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--success-color);
+            color: #6ee7b7;
+        }
+
         .output-section {
-            margin-top: 2.5rem;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success-color);
+            border-radius: 16px;
             display: none;
-            position: relative;
-            z-index: 2;
+            animation: fadeIn 0.5s ease;
         }
 
         .output-section.show {
             display: block;
-            animation: fadeIn 0.4s ease;
         }
 
         @keyframes fadeIn {
@@ -375,104 +381,51 @@
             }
         }
 
+        .output-section h3 {
+            color: var(--success-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .copy-btn {
-            display: inline-block;
-            width: auto;
-            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
             margin-top: 1rem;
-            font-size: 0.95rem;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.15);
-            border-radius: 14px;
-            box-shadow: 
-                0 4px 20px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            display: inline-block;
         }
 
         .copy-btn:hover {
-            background: rgba(15, 23, 42, 0.6);
-            transform: translateY(-3px);
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        footer {
-            margin-top: 3rem;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        footer a {
-            color: var(--primary-light);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        footer a:hover {
-            color: var(--text-primary);
-            text-decoration: underline;
-        }
-
-        .info-box {
-            background: rgba(59, 130, 246, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-            border-radius: 20px;
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            box-shadow: 
-                0 10px 40px rgba(59, 130, 246, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            position: relative;
-            z-index: 2;
-        }
-
-        .info-box strong {
-            color: var(--primary-light);
-            font-size: 1.05rem;
-        }
-
-        .info-box ul {
-            margin-right: 1.5rem;
-            margin-top: 0.8rem;
-        }
-
-        .info-box li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         @media (max-width: 768px) {
             .container {
                 width: 95%;
                 padding: 2rem;
-                border-radius: 24px;
             }
             
             h1 {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
             }
 
             .protocol-buttons {
                 grid-template-columns: 1fr;
             }
 
-            #alertContainer {
-                width: 95%;
-            }
-
             .alert {
-                padding: 1.2rem 1.5rem;
-                font-size: 0.95rem;
+                min-width: 90%;
+                max-width: 90%;
+                bottom: 0.5rem;
+                right: 0.5rem;
             }
         }
 
@@ -494,11 +447,13 @@
     </style>
 </head>
 <body>
-    <!-- Alert Container - Centered on Page -->
-    <div id="alertContainer"></div>
-
     <div class="container">
-        <h1>🔄 مبدل کانفیگ به JSON</h1>
+        <h1>
+            <span>🔄</span>
+            <span>مبدل کانفیگ به JSON</span>
+        </h1>
+        
+        <div id="alertContainer"></div>
 
         <div class="info-box">
             <strong>📌 پشتیبانی کامل از:</strong>
@@ -509,53 +464,67 @@
             </ul>
         </div>
 
-        <div class="form-group">
-            <label>نوع پروتکل 📶</label>
+        <div class="step-container active" id="step1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">📶 نوع پروتکل</div>
+            </div>
             <div class="protocol-buttons">
                 <button type="button" class="protocol-btn active" onclick="selectProtocol('vless', this)">VLESS</button>
                 <button type="button" class="protocol-btn" onclick="selectProtocol('vmess', this)">VMess</button>
             </div>
+            <button class="next-btn" onclick="goToStep(2)">مرحله بعد ←</button>
         </div>
 
-        <div class="form-group">
-            <label for="inboundName">نام اینباند :</label>
-            <input type="text" id="inboundName" placeholder="مثال: ارمنستان یا VLESS+TCP+NONE+8080">
+        <div class="step-container" id="step2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">🏷️ نام اینباند</div>
+            </div>
+            <div class="input-group">
+                <input type="text" id="inboundName" placeholder="مثال: ارمنستان یا VLESS+TCP+NONE+8080">
+            </div>
+            <button class="next-btn" onclick="goToStep(3)" id="step2Btn" disabled>مرحله بعد ←</button>
         </div>
 
-        <div class="form-group">
-            <label for="marzbanJson">JSON کد :</label>
-            <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
+        <div class="step-container" id="step3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">📄 JSON کد</div>
+            </div>
+            <div class="input-group">
+                <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
+            </div>
+            <button class="next-btn" onclick="goToStep(4)" id="step3Btn" disabled>مرحله بعد ←</button>
         </div>
 
-        <div class="form-group">
-            <label for="configInput">کانفیگ مورد نظر :</label>
-            <textarea id="configInput" placeholder="کانفیگ خود را اینجا وارد کنید..."></textarea>
+        <div class="step-container" id="step4">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">⚙️ کانفیگ مورد نظر</div>
+            </div>
+            <div class="input-group">
+                <textarea id="configInput" placeholder="کانفیگ خود را اینجا وارد کنید..."></textarea>
+            </div>
+            <button class="next-btn convert-btn" onclick="convertConfig()">🔄 تبدیل کانفیگ</button>
         </div>
-
-        <button onclick="convertConfig()">🔄 تبدیل کانفیگ</button>
 
         <div class="output-section" id="outputSection">
-            <div class="form-group">
-                <label>JSON نهایی :</label>
-                <textarea id="finalOutput" readonly></textarea>
-                <button class="copy-btn" onclick="copyToClipboard('finalOutput')">📋 کپی</button>
-            </div>
+            <h3>✅ JSON نهایی</h3>
+            <textarea id="finalOutput" readonly></textarea>
+            <button class="copy-btn" onclick="copyToClipboard('finalOutput')">📋 کپی کردن</button>
         </div>
-
-        <footer>
-            <p>ساخته شده   توسط AI 🤖</p>
-        </footer>
     </div>
 
     <script>
         let currentProtocol = 'vless';
+        let currentStep = 1;
 
         function selectProtocol(protocol, element) {
             currentProtocol = protocol;
             document.querySelectorAll('.protocol-btn').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
             
-            document.getElementById('configInput').value = '';
             const placeholderText = {
                 'vless': 'کانفیگ VLESS را اینجا وارد کنید...',
                 'vmess': 'کانفیگ VMess را اینجا وارد کنید...'
@@ -563,12 +532,45 @@
             document.getElementById('configInput').placeholder = placeholderText[protocol];
         }
 
+        function goToStep(stepNumber) {
+            if (stepNumber === 3 && !document.getElementById('inboundName').value.trim()) {
+                showAlert('لطفاً نام اینباند را وارد کنید', 'danger');
+                return;
+            }
+            
+            if (stepNumber === 4 && !document.getElementById('marzbanJson').value.trim()) {
+                showAlert('لطفاً کد JSON را وارد کنید', 'danger');
+                return;
+            }
+
+            const currentStepEl = document.getElementById(`step${currentStep}`);
+            currentStepEl.classList.remove('active');
+            currentStepEl.classList.add('completed');
+
+            const nextStepEl = document.getElementById(`step${stepNumber}`);
+            nextStepEl.classList.add('active');
+            
+            currentStep = stepNumber;
+
+            nextStepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.getElementById('inboundName').addEventListener('input', function() {
+            const btn = document.getElementById('step2Btn');
+            btn.disabled = !this.value.trim();
+        });
+
+        document.getElementById('marzbanJson').addEventListener('input', function() {
+            const btn = document.getElementById('step3Btn');
+            btn.disabled = !this.value.trim();
+        });
+
         function showAlert(message, type = 'danger') {
             const alertContainer = document.getElementById('alertContainer');
             alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
             setTimeout(() => {
                 alertContainer.innerHTML = '';
-            }, 6000);
+            }, 4000);
         }
 
         function parseVlessConfig(configStr, customTag) {
@@ -806,8 +808,8 @@
                 const marzbanJsonStr = document.getElementById('marzbanJson').value.trim();
                 const configStr = document.getElementById('configInput').value.trim();
 
-                if (!inboundName || !marzbanJsonStr || !configStr) {
-                    showAlert('⚠️ لطفاً تمام فیلدها را پر کنید');
+                if (!configStr) {
+                    showAlert('لطفاً کانفیگ را وارد کنید', 'danger');
                     return;
                 }
 
@@ -818,7 +820,6 @@
                 }
                 
                 const existingTags = marzbanConfig.outbounds.map(ob => ob.tag || '');
-                
                 const uniqueTag = generateUniqueTag(inboundName, existingTags);
                 
                 let parsedConfig;
@@ -859,23 +860,18 @@
                 document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
                 document.getElementById('outputSection').classList.add('show');
                 
-                let successMsg = `✅ کانفیگ با موفقیت تبدیل شد!<br><br>`;
-                successMsg += `📌 <strong>پروتکل:</strong> ${parsedConfig.protocol.toUpperCase()}<br>`;
-                successMsg += `🌐 <strong>شبکه:</strong> ${parsedConfig.streamSettings.network}<br>`;
-                successMsg += `🔒 <strong>امنیت:</strong> ${parsedConfig.streamSettings.security}<br>`;
-                if (parsedConfig.streamSettings.wsSettings?.path) {
-                    successMsg += `📁 <strong>Path:</strong> ${parsedConfig.streamSettings.wsSettings.path}<br>`;
-                } else if (parsedConfig.streamSettings.xhttpSettings?.path) {
-                    successMsg += `📁 <strong>Path:</strong> ${parsedConfig.streamSettings.xhttpSettings.path}<br>`;
-                } else if (parsedConfig.streamSettings.grpcSettings?.serviceName) {
-                    successMsg += `📁 <strong>ServiceName:</strong> ${parsedConfig.streamSettings.grpcSettings.serviceName}<br>`;
-                }
-                successMsg += `🏷️ <strong>Tag:</strong> ${parsedConfig.tag}`;
+                let successMsg = `✅ کانفیگ با موفقیت تبدیل شد!<br>`;
+                successMsg += `📌 پروتکل: ${parsedConfig.protocol.toUpperCase()}<br>`;
+                successMsg += `🌐 شبکه: ${parsedConfig.streamSettings.network}<br>`;
+                successMsg += `🔒 امنیت: ${parsedConfig.streamSettings.security}<br>`;
+                successMsg += `🏷️ Tag: ${parsedConfig.tag}`;
                 
                 showAlert(successMsg, 'success');
 
+                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+
             } catch (error) {
-                showAlert('❌ خطا در تبدیل کانفیگ: ' + error.message);
+                showAlert('❌ خطا در تبدیل کانفیگ: ' + error.message, 'danger');
                 console.error(error);
             }
         }
@@ -886,17 +882,17 @@
 
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => {
-                    showAlert('✅ با موفقیت کپی شد!', 'success');
+                    showAlert('✅ کپی شد!', 'success');
                 }).catch(err => {
-                    showAlert('❌ خطا در کپی کردن: ' + err.message, 'danger');
+                    showAlert('❌ خطا در کپی کردن', 'danger');
                 });
             } else {
                 element.select();
                 try {
                     document.execCommand('copy');
-                    showAlert('✅ با موفقیت کپی شد!', 'success');
+                    showAlert('✅ کپی شد!', 'success');
                 } catch (err) {
-                    showAlert('❌ خطا در کپی کردن: ' + err.message, 'danger');
+                    showAlert('❌ خطا در کپی کردن', 'danger');
                 }
             }
         }
