@@ -116,24 +116,18 @@
 
         .step-container {
             margin-bottom: 2rem;
+            display: none;
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
-            max-height: 0;
-            overflow: hidden;
         }
 
         .step-container.active {
+            display: block;
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
-            max-height: 1000px;
-        }
-
-        .step-container.completed {
-            opacity: 0.6;
-            max-height: 1000px;
         }
 
         .step-header {
@@ -158,16 +152,6 @@
             font-size: 1.2rem;
             color: var(--primary-light);
             transition: all 0.3s ease;
-        }
-
-        .step-container.completed .step-number {
-            background: var(--success-color);
-            border-color: var(--success-color);
-            color: white;
-        }
-
-        .step-container.completed .step-number::before {
-            content: '✓';
         }
 
         .step-title {
@@ -234,7 +218,7 @@
             margin-top: 1rem;
         }
 
-        input[type="text"], textarea {
+        input[type="text"], input[type="number"], textarea {
             width: 100%;
             padding: 1.2rem;
             border-radius: 16px;
@@ -253,14 +237,14 @@
             line-height: 1.6;
         }
 
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-light);
             background: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
         }
 
-        input[type="text"]::placeholder, textarea::placeholder {
+        input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder {
             color: rgba(255, 255, 255, 0.4);
         }
 
@@ -461,52 +445,86 @@
                 <li>✅ پروتکل‌های VLESS و VMess</li>
                 <li>✅ انواع شبکه: TCP, WS, gRPC, H2, xHTTP</li>
                 <li>✅ Path, Host, SNI و سایر پارامترها</li>
+                <li>✅ اضافه و حذف کانفیگ‌ها</li>
             </ul>
         </div>
 
-        <div class="step-container active" id="step1">
+        <div class="step-container active" id="step0">
             <div class="step-header">
-                <div class="step-number">1</div>
-                <div class="step-title">📶 نوع پروتکل</div>
+                <div class="step-number">0</div>
+                <div class="step-title">🛠️ انتخاب عملیات</div>
             </div>
             <div class="protocol-buttons">
-                <button type="button" class="protocol-btn active" onclick="selectProtocol('vless', this)">VLESS</button>
-                <button type="button" class="protocol-btn" onclick="selectProtocol('vmess', this)">VMess</button>
+                <button type="button" class="protocol-btn active" onclick="selectMode('add', this)">اضافه کردن کانفیگ</button>
+                <button type="button" class="protocol-btn" onclick="selectMode('delete', this)">حذف کانفیگ</button>
             </div>
-            <button class="next-btn" onclick="goToStep(2)">مرحله بعد ←</button>
+            <button class="next-btn" onclick="prepareMode()" id="step0Btn">مرحله بعد ←</button>
+        </div>
+
+        <div class="step-container" id="step1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">🔢 تعداد کانفیگ‌ها</div>
+            </div>
+            <div class="input-group">
+                <input type="number" id="numConfigs" min="1" placeholder="تعداد کانفیگ‌ها را وارد کنید (مثال: 3)">
+            </div>
+            <button class="next-btn" onclick="prepareSteps()" id="step1Btn" disabled>مرحله بعد ←</button>
+        </div>
+
+        <div class="step-container" id="stepDelete">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">🗑️ جزئیات حذف کانفیگ</div>
+            </div>
+            <div class="input-group">
+                <input type="text" id="deleteInboundName" placeholder="نام اینباند (مثال: VLESS+HTTPUPGRADE+NONE+59505)">
+            </div>
+            <div class="input-group">
+                <input type="text" id="deleteUuid" placeholder="UUID (مثال: 733042a4-b2ff-4360-8d68-2761b848a81e)">
+            </div>
+            <div class="input-group">
+                <textarea id="marzbanJsonDelete" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
+            </div>
+            <button class="next-btn convert-btn" onclick="deleteConfig()" id="deleteBtn" disabled>🗑️ حذف کانفیگ</button>
         </div>
 
         <div class="step-container" id="step2">
             <div class="step-header">
                 <div class="step-number">2</div>
-                <div class="step-title">🏷️ نام اینباند</div>
+                <div class="step-title">📶 نوع پروتکل‌ها</div>
             </div>
-            <div class="input-group">
-                <input type="text" id="inboundName" placeholder="مثال: ارمنستان یا VLESS+TCP+NONE+8080">
-            </div>
-            <button class="next-btn" onclick="goToStep(3)" id="step2Btn" disabled>مرحله بعد ←</button>
+            <div id="protocolContainer"></div>
+            <button class="next-btn" onclick="goToStep(3)" id="step2Btn">مرحله بعد ←</button>
         </div>
 
         <div class="step-container" id="step3">
             <div class="step-header">
                 <div class="step-number">3</div>
-                <div class="step-title">📄 JSON کد</div>
+                <div class="step-title">🏷️ نام‌های اینباند</div>
             </div>
-            <div class="input-group">
-                <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
-            </div>
+            <div id="inboundContainer"></div>
             <button class="next-btn" onclick="goToStep(4)" id="step3Btn" disabled>مرحله بعد ←</button>
         </div>
 
         <div class="step-container" id="step4">
             <div class="step-header">
                 <div class="step-number">4</div>
-                <div class="step-title">⚙️ کانفیگ مورد نظر</div>
+                <div class="step-title">📄 JSON کد</div>
             </div>
             <div class="input-group">
-                <textarea id="configInput" placeholder="کانفیگ خود را اینجا وارد کنید..."></textarea>
+                <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
             </div>
-            <button class="next-btn convert-btn" onclick="convertConfig()">🔄 تبدیل کانفیگ</button>
+            <button class="next-btn" onclick="goToStep(5)" id="step4Btn" disabled>مرحله بعد ←</button>
+        </div>
+
+        <div class="step-container" id="step5">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <div class="step-title">⚙️ کانفیگ‌های مورد نظر</div>
+            </div>
+            <div id="configContainer"></div>
+            <button class="next-btn convert-btn" onclick="convertConfig()" id="convertBtn" disabled>🔄 تبدیل کانفیگ</button>
         </div>
 
         <div class="output-section" id="outputSection">
@@ -517,53 +535,167 @@
     </div>
 
     <script>
-        let currentProtocol = 'vless';
-        let currentStep = 1;
+        let selectedProtocols = [];
+        let numConfigs = 0;
+        let currentStep = 0;
+        let selectedMode = 'add';
 
-        function selectProtocol(protocol, element) {
-            currentProtocol = protocol;
-            document.querySelectorAll('.protocol-btn').forEach(btn => btn.classList.remove('active'));
+        window.addEventListener('load', function() {
+            document.getElementById('outputSection').classList.remove('show');
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('finalOutput').value = '';
+            const steps = document.querySelectorAll('.step-container');
+            steps.forEach(step => {
+                if (step.id !== 'step0') {
+                    step.classList.remove('active');
+                    step.style.display = 'none';
+                } else {
+                    step.classList.add('active');
+                    step.style.display = 'block';
+                }
+            });
+            document.getElementById('numConfigs').value = '';
+            document.getElementById('step1Btn').disabled = true;
+            document.getElementById('deleteInboundName').value = '';
+            document.getElementById('deleteUuid').value = '';
+            document.getElementById('marzbanJsonDelete').value = '';
+            document.getElementById('deleteBtn').disabled = true;
+        });
+
+        function selectMode(mode, element) {
+            selectedMode = mode;
+            const buttons = element.parentNode.querySelectorAll('.protocol-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
-            
-            const placeholderText = {
-                'vless': 'کانفیگ VLESS را اینجا وارد کنید...',
-                'vmess': 'کانفیگ VMess را اینجا وارد کنید...'
-            };
-            document.getElementById('configInput').placeholder = placeholderText[protocol];
+        }
+
+        function prepareMode() {
+            if (selectedMode === 'add') {
+                goToStep(1);
+            } else if (selectedMode === 'delete') {
+                goToStep('delete');
+            }
+        }
+
+        document.getElementById('numConfigs').addEventListener('input', function() {
+            const val = parseInt(this.value);
+            document.getElementById('step1Btn').disabled = isNaN(val) || val < 1;
+        });
+
+        document.getElementById('marzbanJson').addEventListener('input', function() {
+            document.getElementById('step4Btn').disabled = !this.value.trim();
+        });
+
+        document.getElementById('deleteInboundName').addEventListener('input', checkDeleteInputs);
+        document.getElementById('deleteUuid').addEventListener('input', checkDeleteInputs);
+        document.getElementById('marzbanJsonDelete').addEventListener('input', checkDeleteInputs);
+
+        function checkDeleteInputs() {
+            const inboundName = document.getElementById('deleteInboundName').value.trim();
+            const uuid = document.getElementById('deleteUuid').value.trim();
+            const json = document.getElementById('marzbanJsonDelete').value.trim();
+            document.getElementById('deleteBtn').disabled = !inboundName || !uuid || !json;
+        }
+
+        function prepareSteps() {
+            numConfigs = parseInt(document.getElementById('numConfigs').value);
+            if (isNaN(numConfigs) || numConfigs < 1) {
+                showAlert('لطفاً تعداد معتبر وارد کنید', 'danger');
+                return;
+            }
+            generateProtocols();
+            generateInbounds();
+            goToStep(2);
+        }
+
+        function generateProtocols() {
+            const container = document.getElementById('protocolContainer');
+            container.innerHTML = '';
+            selectedProtocols = new Array(numConfigs).fill('vless');
+            for (let i = 0; i < numConfigs; i++) {
+                container.innerHTML += `
+                    <div style="margin-bottom: 1rem;">
+                        <label>پروتکل شماره ${i + 1}</label>
+                        <div class="protocol-buttons">
+                            <button type="button" class="protocol-btn active" onclick="selectProtocol(${i}, 'vless', this)">VLESS</button>
+                            <button type="button" class="protocol-btn" onclick="selectProtocol(${i}, 'vmess', this)">VMess</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateInbounds() {
+            const container = document.getElementById('inboundContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < numConfigs; i++) {
+                container.innerHTML += `
+                    <div class="input-group" style="margin-bottom: 1rem;">
+                        <input type="text" id="inboundName${i}" placeholder="نام اینباند شماره ${i + 1} (مثال: VLESS+TCP${i + 1})">
+                    </div>
+                `;
+                document.getElementById(`inboundName${i}`).addEventListener('input', checkStep3);
+            }
+            checkStep3();
+        }
+
+        function checkStep3() {
+            const allFilled = Array.from(document.querySelectorAll('[id^="inboundName"]')).every(inp => inp.value.trim() !== '');
+            document.getElementById('step3Btn').disabled = !allFilled;
+        }
+
+        function generateConfigs() {
+            const container = document.getElementById('configContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < numConfigs; i++) {
+                const protocol = selectedProtocols[i];
+                container.innerHTML += `
+                    <div class="input-group" style="margin-bottom: 1rem;">
+                        <textarea id="configInput${i}" placeholder="کانفیگ ${protocol.toUpperCase()} شماره ${i + 1} را وارد کنید..."></textarea>
+                    </div>
+                `;
+                document.getElementById(`configInput${i}`).addEventListener('input', checkStep5);
+            }
+            checkStep5();
+        }
+
+        function checkStep5() {
+            const allFilled = Array.from(document.querySelectorAll('[id^="configInput"]')).every(inp => inp.value.trim() !== '');
+            document.getElementById('convertBtn').disabled = !allFilled;
+        }
+
+        function selectProtocol(index, protocol, element) {
+            selectedProtocols[index] = protocol;
+            const buttons = element.parentNode.querySelectorAll('.protocol-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
         }
 
         function goToStep(stepNumber) {
-            if (stepNumber === 3 && !document.getElementById('inboundName').value.trim()) {
-                showAlert('لطفاً نام اینباند را وارد کنید', 'danger');
-                return;
-            }
-            
-            if (stepNumber === 4 && !document.getElementById('marzbanJson').value.trim()) {
-                showAlert('لطفاً کد JSON را وارد کنید', 'danger');
-                return;
+            if (stepNumber === 5) {
+                if (!document.getElementById('marzbanJson').value.trim()) {
+                    showAlert('لطفاً کد JSON را وارد کنید', 'danger');
+                    return;
+                }
+                generateConfigs();
             }
 
             const currentStepEl = document.getElementById(`step${currentStep}`);
             currentStepEl.classList.remove('active');
-            currentStepEl.classList.add('completed');
+            currentStepEl.style.display = 'none';
 
-            const nextStepEl = document.getElementById(`step${stepNumber}`);
+            let nextStepId = `step${stepNumber}`;
+            if (stepNumber === 'delete') {
+                nextStepId = 'stepDelete';
+            }
+            const nextStepEl = document.getElementById(nextStepId);
             nextStepEl.classList.add('active');
+            nextStepEl.style.display = 'block';
             
             currentStep = stepNumber;
 
-            nextStepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        document.getElementById('inboundName').addEventListener('input', function() {
-            const btn = document.getElementById('step2Btn');
-            btn.disabled = !this.value.trim();
-        });
-
-        document.getElementById('marzbanJson').addEventListener('input', function() {
-            const btn = document.getElementById('step3Btn');
-            btn.disabled = !this.value.trim();
-        });
 
         function showAlert(message, type = 'danger') {
             const alertContainer = document.getElementById('alertContainer');
@@ -804,15 +936,7 @@
 
         function convertConfig() {
             try {
-                const inboundName = document.getElementById('inboundName').value.trim();
                 const marzbanJsonStr = document.getElementById('marzbanJson').value.trim();
-                const configStr = document.getElementById('configInput').value.trim();
-
-                if (!configStr) {
-                    showAlert('لطفاً کانفیگ را وارد کنید', 'danger');
-                    return;
-                }
-
                 const marzbanConfig = JSON.parse(marzbanJsonStr);
                 
                 if (!marzbanConfig.outbounds) {
@@ -820,17 +944,7 @@
                 }
                 
                 const existingTags = marzbanConfig.outbounds.map(ob => ob.tag || '');
-                const uniqueTag = generateUniqueTag(inboundName, existingTags);
                 
-                let parsedConfig;
-                if (currentProtocol === 'vless') {
-                    parsedConfig = parseVlessConfig(configStr, uniqueTag);
-                } else if (currentProtocol === 'vmess') {
-                    parsedConfig = parseVmessConfig(configStr, uniqueTag);
-                }
-                
-                marzbanConfig.outbounds.push(parsedConfig);
-
                 if (!marzbanConfig.routing) {
                     marzbanConfig.routing = { rules: [] };
                 }
@@ -838,40 +952,113 @@
                 if (!marzbanConfig.routing.rules) {
                     marzbanConfig.routing.rules = [];
                 }
-                
-                const existingRuleIndex = marzbanConfig.routing.rules.findIndex(
-                    rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
-                );
-                
-                if (existingRuleIndex !== -1) {
-                    marzbanConfig.routing.rules[existingRuleIndex] = {
-                        type: "field",
-                        inboundTag: [inboundName],
-                        outboundTag: parsedConfig.tag
-                    };
-                } else {
-                    marzbanConfig.routing.rules.push({
-                        type: "field",
-                        inboundTag: [inboundName],
-                        outboundTag: parsedConfig.tag
-                    });
+
+                for (let i = 0; i < numConfigs; i++) {
+                    const inboundName = document.getElementById(`inboundName${i}`).value.trim();
+                    const configStr = document.getElementById(`configInput${i}`).value.trim();
+
+                    if (!configStr) {
+                        showAlert(`کانفیگ شماره ${i + 1} خالی است`, 'danger');
+                        continue;
+                    }
+
+                    const protocol = selectedProtocols[i];
+                    const uniqueTag = generateUniqueTag(inboundName, existingTags);
+                    existingTags.push(uniqueTag);
+                    
+                    let parsedConfig;
+                    if (protocol === 'vless') {
+                        parsedConfig = parseVlessConfig(configStr, uniqueTag);
+                    } else if (protocol === 'vmess') {
+                        parsedConfig = parseVmessConfig(configStr, uniqueTag);
+                    }
+                    
+                    marzbanConfig.outbounds.push(parsedConfig);
+
+                    const existingRuleIndex = marzbanConfig.routing.rules.findIndex(
+                        rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
+                    );
+                    
+                    if (existingRuleIndex !== -1) {
+                        marzbanConfig.routing.rules[existingRuleIndex].outboundTag = uniqueTag;
+                    } else {
+                        marzbanConfig.routing.rules.push({
+                            type: "field",
+                            inboundTag: [inboundName],
+                            outboundTag: uniqueTag
+                        });
+                    }
                 }
 
                 document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
                 document.getElementById('outputSection').classList.add('show');
+                document.getElementById('outputSection').style.display = 'block';
+                document.getElementById('step5').style.display = 'none';
                 
-                let successMsg = `✅ کانفیگ با موفقیت تبدیل شد!<br>`;
-                successMsg += `📌 پروتکل: ${parsedConfig.protocol.toUpperCase()}<br>`;
-                successMsg += `🌐 شبکه: ${parsedConfig.streamSettings.network}<br>`;
-                successMsg += `🔒 امنیت: ${parsedConfig.streamSettings.security}<br>`;
-                successMsg += `🏷️ Tag: ${parsedConfig.tag}`;
-                
-                showAlert(successMsg, 'success');
+                showAlert('✅ کانفیگ‌ها با موفقیت اضافه شدند!', 'success');
 
-                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (error) {
                 showAlert('❌ خطا در تبدیل کانفیگ: ' + error.message, 'danger');
+                console.error(error);
+            }
+        }
+
+        function deleteConfig() {
+            try {
+                const inboundName = document.getElementById('deleteInboundName').value.trim();
+                const uuid = document.getElementById('deleteUuid').value.trim();
+                const marzbanJsonStr = document.getElementById('marzbanJsonDelete').value.trim();
+                const marzbanConfig = JSON.parse(marzbanJsonStr);
+
+                if (!marzbanConfig.outbounds || !marzbanConfig.routing || !marzbanConfig.routing.rules) {
+                    throw new Error('ساختار JSON نامعتبر است');
+                }
+
+                const ruleIndex = marzbanConfig.routing.rules.findIndex(
+                    rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
+                );
+
+                if (ruleIndex === -1) {
+                    throw new Error('رول مربوطه یافت نشد');
+                }
+
+                const outboundTag = marzbanConfig.routing.rules[ruleIndex].outboundTag;
+
+                const outboundIndex = marzbanConfig.outbounds.findIndex(
+                    ob => ob.tag === outboundTag
+                );
+
+                if (outboundIndex === -1) {
+                    throw new Error('اوت‌باند مربوطه یافت نشد');
+                }
+
+                const users = marzbanConfig.outbounds[outboundIndex].settings.vnext[0].users;
+                const userIndex = users.findIndex(user => user.id === uuid);
+
+                if (userIndex === -1) {
+                    throw new Error('UUID مربوطه یافت نشد');
+                }
+
+                if (users.length > 1) {
+                    users.splice(userIndex, 1);
+                } else {
+                    marzbanConfig.outbounds.splice(outboundIndex, 1);
+                    marzbanConfig.routing.rules.splice(ruleIndex, 1);
+                }
+
+                document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
+                document.getElementById('outputSection').classList.add('show');
+                document.getElementById('outputSection').style.display = 'block';
+                document.getElementById('stepDelete').style.display = 'none';
+                
+                showAlert('✅ کانفیگ با موفقیت حذف شد!', 'success');
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                showAlert('❌ خطا در حذف کانفیگ: ' + error.message, 'danger');
                 console.error(error);
             }
         }
