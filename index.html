@@ -292,11 +292,55 @@
             box-shadow: none;
         }
 
+        .back-btn {
+            background: linear-gradient(135deg, var(--error-color), #b91c1c);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            margin-left: 1rem;
+            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .back-btn:hover::before {
+            left: 100%;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(239, 68, 68, 0.4);
+        }
+
         .convert-btn {
             background: linear-gradient(135deg, var(--success-color), #059669);
             width: 100%;
             padding: 1.2rem;
             font-size: 1.1rem;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .alert {
@@ -411,6 +455,10 @@
                 bottom: 0.5rem;
                 right: 0.5rem;
             }
+
+            .button-group {
+                flex-direction: column-reverse;
+            }
         }
 
         @font-face {
@@ -458,7 +506,9 @@
                 <button type="button" class="protocol-btn active" onclick="selectMode('add', this)">اضافه کردن کانفیگ</button>
                 <button type="button" class="protocol-btn" onclick="selectMode('delete', this)">حذف کانفیگ</button>
             </div>
-            <button class="next-btn" onclick="prepareMode()" id="step0Btn">مرحله بعد ←</button>
+            <div class="button-group">
+                <button class="next-btn" onclick="prepareMode()" id="step0Btn">مرحله بعد ←</button>
+            </div>
         </div>
 
         <div class="step-container" id="step1">
@@ -469,7 +519,10 @@
             <div class="input-group">
                 <input type="number" id="numConfigs" min="1" placeholder="تعداد کانفیگ‌ها را وارد کنید (مثال: 3)">
             </div>
-            <button class="next-btn" onclick="prepareSteps()" id="step1Btn" disabled>مرحله بعد ←</button>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn" onclick="prepareSteps()" id="step1Btn" disabled>مرحله بعد ←</button>
+            </div>
         </div>
 
         <div class="step-container" id="stepDelete">
@@ -486,7 +539,10 @@
             <div class="input-group">
                 <textarea id="marzbanJsonDelete" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
             </div>
-            <button class="next-btn convert-btn" onclick="deleteConfig()" id="deleteBtn" disabled>🗑️ حذف کانفیگ</button>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn convert-btn" onclick="deleteConfig()" id="deleteBtn" disabled>🗑️ حذف کانفیگ</button>
+            </div>
         </div>
 
         <div class="step-container" id="step2">
@@ -495,7 +551,10 @@
                 <div class="step-title">📶 نوع پروتکل‌ها</div>
             </div>
             <div id="protocolContainer"></div>
-            <button class="next-btn" onclick="goToStep(3)" id="step2Btn">مرحله بعد ←</button>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn" onclick="goToStep(3)" id="step2Btn">مرحله بعد ←</button>
+            </div>
         </div>
 
         <div class="step-container" id="step3">
@@ -504,7 +563,10 @@
                 <div class="step-title">🏷️ نام‌های اینباند</div>
             </div>
             <div id="inboundContainer"></div>
-            <button class="next-btn" onclick="goToStep(4)" id="step3Btn" disabled>مرحله بعد ←</button>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn" onclick="goToStep(4)" id="step3Btn" disabled>مرحله بعد ←</button>
+            </div>
         </div>
 
         <div class="step-container" id="step4">
@@ -515,7 +577,10 @@
             <div class="input-group">
                 <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
             </div>
-            <button class="next-btn" onclick="goToStep(5)" id="step4Btn" disabled>مرحله بعد ←</button>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn" onclick="goToStep(5)" id="step4Btn" disabled>مرحله بعد ←</button>
+            </div>
         </div>
 
         <div class="step-container" id="step5">
@@ -524,7 +589,10 @@
                 <div class="step-title">⚙️ کانفیگ‌های مورد نظر</div>
             </div>
             <div id="configContainer"></div>
-            <button class="next-btn convert-btn" onclick="convertConfig()" id="convertBtn" disabled>🔄 تبدیل کانفیگ</button>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn convert-btn" onclick="convertConfig()" id="convertBtn" disabled>🔄 تبدیل کانفیگ</button>
+            </div>
         </div>
 
         <div class="output-section" id="outputSection">
@@ -539,8 +607,10 @@
         let numConfigs = 0;
         let currentStep = 0;
         let selectedMode = 'add';
+        let stepHistory = [];
 
         window.addEventListener('load', function() {
+            stepHistory = [];
             document.getElementById('outputSection').classList.remove('show');
             document.getElementById('outputSection').style.display = 'none';
             document.getElementById('finalOutput').value = '';
@@ -680,7 +750,9 @@
                 generateConfigs();
             }
 
-            const currentStepEl = document.getElementById(`step${currentStep}`);
+            stepHistory.push(currentStep);
+
+            const currentStepEl = document.getElementById(currentStep === 'delete' ? 'stepDelete' : `step${currentStep}`);
             currentStepEl.classList.remove('active');
             currentStepEl.style.display = 'none';
 
@@ -695,6 +767,24 @@
             currentStep = stepNumber;
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBack() {
+            if (stepHistory.length > 0) {
+                const prevStep = stepHistory.pop();
+                const currentStepEl = document.getElementById(currentStep === 'delete' ? 'stepDelete' : `step${currentStep}`);
+                currentStepEl.classList.remove('active');
+                currentStepEl.style.display = 'none';
+
+                const prevStepId = prevStep === 'delete' ? 'stepDelete' : `step${prevStep}`;
+                const prevStepEl = document.getElementById(prevStepId);
+                prevStepEl.classList.add('active');
+                prevStepEl.style.display = 'block';
+
+                currentStep = prevStep;
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         function showAlert(message, type = 'danger') {
