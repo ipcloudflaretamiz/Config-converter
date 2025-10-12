@@ -525,23 +525,43 @@
             </div>
         </div>
 
-        <div class="step-container" id="stepDelete">
+        <div class="step-container" id="stepDelete1">
             <div class="step-header">
                 <div class="step-number">1</div>
-                <div class="step-title">🗑️ جزئیات حذف کانفیگ</div>
+                <div class="step-title">🔢 تعداد کانفیگ‌های حذف</div>
             </div>
             <div class="input-group">
-                <input type="text" id="deleteInboundName" placeholder="نام اینباند (مثال: VLESS+HTTPUPGRADE+NONE+59505)">
+                <input type="number" id="numDeleteConfigs" min="1" placeholder="تعداد کانفیگ‌ها را وارد کنید (مثال: 3)">
             </div>
-            <div class="input-group">
-                <input type="text" id="deleteUuid" placeholder="UUID (مثال: 733042a4-b2ff-4360-8d68-2761b848a81e)">
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn" onclick="prepareDelete()" id="stepDelete1Btn" disabled>مرحله بعد ←</button>
+            </div>
+        </div>
+
+        <div class="step-container" id="stepDelete2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">🗑️ جزئیات حذف کانفیگ‌ها</div>
+            </div>
+            <div id="deleteDetailsContainer"></div>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
+                <button class="next-btn" onclick="goToStep('Delete3')" id="stepDelete2Btn" disabled>مرحله بعد ←</button>
+            </div>
+        </div>
+
+        <div class="step-container" id="stepDelete3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">📄 JSON کد</div>
             </div>
             <div class="input-group">
                 <textarea id="marzbanJsonDelete" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
             </div>
             <div class="button-group">
                 <button class="back-btn" onclick="goBack()">→ مرحله قبل</button>
-                <button class="next-btn convert-btn" onclick="deleteConfig()" id="deleteBtn" disabled>🗑️ حذف کانفیگ</button>
+                <button class="next-btn convert-btn" onclick="deleteConfigs()" id="deleteBtn" disabled>🗑️ حذف کانفیگ‌ها</button>
             </div>
         </div>
 
@@ -605,6 +625,7 @@
     <script>
         let selectedProtocols = [];
         let numConfigs = 0;
+        let numDeletes = 0;
         let currentStep = 0;
         let selectedMode = 'add';
         let stepHistory = [];
@@ -626,10 +647,10 @@
             });
             document.getElementById('numConfigs').value = '';
             document.getElementById('step1Btn').disabled = true;
-            document.getElementById('deleteInboundName').value = '';
-            document.getElementById('deleteUuid').value = '';
-            document.getElementById('marzbanJsonDelete').value = '';
-            document.getElementById('deleteBtn').disabled = true;
+            if (document.getElementById('numDeleteConfigs')) document.getElementById('numDeleteConfigs').value = '';
+            if (document.getElementById('stepDelete1Btn')) document.getElementById('stepDelete1Btn').disabled = true;
+            if (document.getElementById('marzbanJsonDelete')) document.getElementById('marzbanJsonDelete').value = '';
+            if (document.getElementById('deleteBtn')) document.getElementById('deleteBtn').disabled = true;
         });
 
         function selectMode(mode, element) {
@@ -643,7 +664,7 @@
             if (selectedMode === 'add') {
                 goToStep(1);
             } else if (selectedMode === 'delete') {
-                goToStep('delete');
+                goToStep('Delete1');
             }
         }
 
@@ -652,19 +673,21 @@
             document.getElementById('step1Btn').disabled = isNaN(val) || val < 1;
         });
 
+        if (document.getElementById('numDeleteConfigs')) {
+            document.getElementById('numDeleteConfigs').addEventListener('input', function() {
+                const val = parseInt(this.value);
+                document.getElementById('stepDelete1Btn').disabled = isNaN(val) || val < 1;
+            });
+        }
+
         document.getElementById('marzbanJson').addEventListener('input', function() {
             document.getElementById('step4Btn').disabled = !this.value.trim();
         });
 
-        document.getElementById('deleteInboundName').addEventListener('input', checkDeleteInputs);
-        document.getElementById('deleteUuid').addEventListener('input', checkDeleteInputs);
-        document.getElementById('marzbanJsonDelete').addEventListener('input', checkDeleteInputs);
-
-        function checkDeleteInputs() {
-            const inboundName = document.getElementById('deleteInboundName').value.trim();
-            const uuid = document.getElementById('deleteUuid').value.trim();
-            const json = document.getElementById('marzbanJsonDelete').value.trim();
-            document.getElementById('deleteBtn').disabled = !inboundName || !uuid || !json;
+        if (document.getElementById('marzbanJsonDelete')) {
+            document.getElementById('marzbanJsonDelete').addEventListener('input', function() {
+                document.getElementById('deleteBtn').disabled = !this.value.trim();
+            });
         }
 
         function prepareSteps() {
@@ -676,6 +699,45 @@
             generateProtocols();
             generateInbounds();
             goToStep(2);
+        }
+
+        function prepareDelete() {
+            numDeletes = parseInt(document.getElementById('numDeleteConfigs').value);
+            if (isNaN(numDeletes) || numDeletes < 1) {
+                showAlert('لطفاً تعداد معتبر وارد کنید', 'danger');
+                return;
+            }
+            generateDeleteDetails();
+            goToStep('Delete2');
+        }
+
+        function generateDeleteDetails() {
+            const container = document.getElementById('deleteDetailsContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < numDeletes; i++) {
+                container.innerHTML += `
+                    <div style="margin-bottom: 1rem;">
+                        <div class="input-group">
+                            <input type="text" id="deleteInboundName${i}" placeholder="نام اینباند شماره ${i + 1} (مثال: VLESS+HTTPUPGRADE+NONE+59505)">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="deleteUuid${i}" placeholder="UUID شماره ${i + 1} (مثال: 733042a4-b2ff-4360-8d68-2761b848a81e)">
+                        </div>
+                    </div>
+                `;
+                document.getElementById(`deleteInboundName${i}`).addEventListener('input', checkDeleteDetails);
+                document.getElementById(`deleteUuid${i}`).addEventListener('input', checkDeleteDetails);
+            }
+            checkDeleteDetails();
+        }
+
+        function checkDeleteDetails() {
+            let allFilled = true;
+            for (let i = 0; i < numDeletes; i++) {
+                allFilled &= !!document.getElementById(`deleteInboundName${i}`).value.trim();
+                allFilled &= !!document.getElementById(`deleteUuid${i}`).value.trim();
+            }
+            document.getElementById('stepDelete2Btn').disabled = !allFilled;
         }
 
         function generateProtocols() {
@@ -741,8 +803,8 @@
             element.classList.add('active');
         }
 
-        function goToStep(stepNumber) {
-            if (stepNumber === 5) {
+        function goToStep(step) {
+            if (step === 5) {
                 if (!document.getElementById('marzbanJson').value.trim()) {
                     showAlert('لطفاً کد JSON را وارد کنید', 'danger');
                     return;
@@ -752,19 +814,17 @@
 
             stepHistory.push(currentStep);
 
-            const currentStepEl = document.getElementById(currentStep === 'delete' ? 'stepDelete' : `step${currentStep}`);
+            const currentId = typeof currentStep === 'number' ? `step${currentStep}` : `step${currentStep}`;
+            const currentStepEl = document.getElementById(currentId);
             currentStepEl.classList.remove('active');
             currentStepEl.style.display = 'none';
 
-            let nextStepId = `step${stepNumber}`;
-            if (stepNumber === 'delete') {
-                nextStepId = 'stepDelete';
-            }
+            const nextStepId = typeof step === 'number' ? `step${step}` : `step${step}`;
             const nextStepEl = document.getElementById(nextStepId);
             nextStepEl.classList.add('active');
             nextStepEl.style.display = 'block';
             
-            currentStep = stepNumber;
+            currentStep = step;
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -772,11 +832,12 @@
         function goBack() {
             if (stepHistory.length > 0) {
                 const prevStep = stepHistory.pop();
-                const currentStepEl = document.getElementById(currentStep === 'delete' ? 'stepDelete' : `step${currentStep}`);
+                const currentId = typeof currentStep === 'number' ? `step${currentStep}` : `step${currentStep}`;
+                const currentStepEl = document.getElementById(currentId);
                 currentStepEl.classList.remove('active');
                 currentStepEl.style.display = 'none';
 
-                const prevStepId = prevStep === 'delete' ? 'stepDelete' : `step${prevStep}`;
+                const prevStepId = typeof prevStep === 'number' ? `step${prevStep}` : `step${prevStep}`;
                 const prevStepEl = document.getElementById(prevStepId);
                 prevStepEl.classList.add('active');
                 prevStepEl.style.display = 'block';
@@ -1095,10 +1156,8 @@
             }
         }
 
-        function deleteConfig() {
+        function deleteConfigs() {
             try {
-                const inboundName = document.getElementById('deleteInboundName').value.trim();
-                const uuid = document.getElementById('deleteUuid').value.trim();
                 const marzbanJsonStr = document.getElementById('marzbanJsonDelete').value.trim();
                 const marzbanConfig = JSON.parse(marzbanJsonStr);
 
@@ -1106,44 +1165,49 @@
                     throw new Error('ساختار JSON نامعتبر است');
                 }
 
-                const ruleIndex = marzbanConfig.routing.rules.findIndex(
-                    rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
-                );
+                for (let i = 0; i < numDeletes; i++) {
+                    const inboundName = document.getElementById(`deleteInboundName${i}`).value.trim();
+                    const uuid = document.getElementById(`deleteUuid${i}`).value.trim();
 
-                if (ruleIndex === -1) {
-                    throw new Error('رول مربوطه یافت نشد');
-                }
+                    const ruleIndex = marzbanConfig.routing.rules.findIndex(
+                        rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
+                    );
 
-                const outboundTag = marzbanConfig.routing.rules[ruleIndex].outboundTag;
+                    if (ruleIndex === -1) {
+                        throw new Error(`رول مربوطه برای ${inboundName} یافت نشد`);
+                    }
 
-                const outboundIndex = marzbanConfig.outbounds.findIndex(
-                    ob => ob.tag === outboundTag
-                );
+                    const outboundTag = marzbanConfig.routing.rules[ruleIndex].outboundTag;
 
-                if (outboundIndex === -1) {
-                    throw new Error('اوت‌باند مربوطه یافت نشد');
-                }
+                    const outboundIndex = marzbanConfig.outbounds.findIndex(
+                        ob => ob.tag === outboundTag
+                    );
 
-                const users = marzbanConfig.outbounds[outboundIndex].settings.vnext[0].users;
-                const userIndex = users.findIndex(user => user.id === uuid);
+                    if (outboundIndex === -1) {
+                        throw new Error(`اوت‌باند مربوطه برای ${inboundName} یافت نشد`);
+                    }
 
-                if (userIndex === -1) {
-                    throw new Error('UUID مربوطه یافت نشد');
-                }
+                    const users = marzbanConfig.outbounds[outboundIndex].settings.vnext[0].users;
+                    const userIndex = users.findIndex(user => user.id === uuid);
 
-                if (users.length > 1) {
-                    users.splice(userIndex, 1);
-                } else {
-                    marzbanConfig.outbounds.splice(outboundIndex, 1);
-                    marzbanConfig.routing.rules.splice(ruleIndex, 1);
+                    if (userIndex === -1) {
+                        throw new Error(`UUID مربوطه برای ${inboundName} یافت نشد`);
+                    }
+
+                    if (users.length > 1) {
+                        users.splice(userIndex, 1);
+                    } else {
+                        marzbanConfig.outbounds.splice(outboundIndex, 1);
+                        marzbanConfig.routing.rules.splice(ruleIndex, 1);
+                    }
                 }
 
                 document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
                 document.getElementById('outputSection').classList.add('show');
                 document.getElementById('outputSection').style.display = 'block';
-                document.getElementById('stepDelete').style.display = 'none';
+                document.getElementById('stepDelete3').style.display = 'none';
                 
-                showAlert('✅ کانفیگ با موفقیت حذف شد!', 'success');
+                showAlert('✅ کانفیگ‌ها با موفقیت حذف شدند!', 'success');
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
