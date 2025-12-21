@@ -1,36 +1,55 @@
 <!DOCTYPE html>
 <html lang="fa">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مبدل کانفیگ</title>
     <style>
-
         :root {
-            --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --color-text: rgba(245, 245, 245, 1);
-            --line-height-normal: 1.5;
-            --primary-color: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --error-color: #ef4444;
-            --success-color: #10b981;
-            --text-secondary: rgba(255, 255, 255, 0.7);
+            --primary-blue: #3b82f6;
+            --primary-purple: #8b5cf6;
+            --primary-yellow: #eab308;
+            --primary-green: #22c55e;
+            --primary-red: #ef4444;
+            --primary-orange: #f97316;
+
+            --primary: var(--primary-blue);
+            --primary-hover: #2563eb;
+
+            --bg-body: #f8fafc;
+            --bg-container: rgba(255, 255, 255, 0.7);
+            --bg-surface: rgba(255, 255, 255, 0.5);
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --glass-blur: 12px;
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --success: #10b981;
+            --error: #ef4444;
         }
 
-        @font-face {
-            font-family: 'FKGroteskNeue';
-            src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-container: rgba(30, 41, 59, 0.7);
+            --bg-surface: rgba(15, 23, 42, 0.5);
+            --text-main: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --input-bg: rgba(15, 23, 42, 0.6);
         }
 
         @font-face {
             font-family: 'Arad';
-            src: url('./fonts/Arad-Bold.ttf') format('truetype');
+            src: url('./fonts/AradFD-SemiBold.ttf') format('truetype');
+            font-weight: bold;
         }
 
         @font-face {
             font-family: 'Arad';
-            src: url('./fonts/Arad-Medium.ttf') format('truetype');
+            src: url('./fonts/AradFD-SemiBold.ttf') format('truetype');
             font-weight: normal;
         }
 
@@ -38,142 +57,172 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        html {
-            font-size: 14px;
-            font-family: var(--font-family-base);
-            line-height: var(--line-height-normal);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         body {
-            font-family: 'Arad', var(--font-family-base);
-            background: url('./img/rxmmd.jpeg') center/cover fixed no-repeat;
+            font-family: 'Arad', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at 50% 0%, var(--primary), transparent 25%);
+            background-attachment: fixed;
             min-height: 100vh;
-            min-height: 100dvh;
-            padding: 2rem 0;
-            direction: rtl;
-            color: var(--color-text);
-            line-height: var(--line-height-normal);
-            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 2rem 1rem;
+            direction: rtl;
+            color: var(--text-main);
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
+        .container {
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.35);
-            pointer-events: none;
-            z-index: 0;
+            max-width: 850px;
+            background: var(--bg-container);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px var(--shadow-color);
+            position: relative;
+            z-index: 10;
         }
 
-        .icon {
+        /* Toolbar / Settings */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .theme-controls {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-surface);
+            padding: 0.4rem;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .theme-bubble {
             width: 24px;
             height: 24px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            vertical-align: middle;
-            margin-left: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 3rem;
-            border-radius: 24px;
+        .theme-bubble:hover {
+            transform: scale(1.2);
+        }
 
-           background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(50px) saturate(180%); 
-            -webkit-backdrop-filter: blur(50px) saturate(180%);
+        .theme-bubble.active {
+            border-color: var(--text-main);
+            transform: scale(1.1);
+        }
 
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                0 8px 32px rgba(99, 102, 241, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        .mode-toggle {
+            display: flex;
+            background: var(--bg-surface);
+            padding: 0.3rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            gap: 0.2rem;
+        }
 
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
+        .mode-btn {
+            padding: 0.5rem 0.8rem;
+            border-radius: 9px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            color: var(--primary-light);
+            font-size: 2.2rem;
+            font-weight: bold;
             text-align: center;
             margin-bottom: 2.5rem;
-            font-size: 2rem;
-            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            font-weight: bold;
+            gap: 0.8rem;
+            color: var(--primary);
         }
 
         .info-box {
-            background: rgba(99, 102, 241, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+            margin-bottom: 2.5rem;
         }
 
         .info-box strong {
-            color: var(--primary-light);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.8rem;
+            gap: 0.6rem;
+            color: var(--primary);
             font-size: 1.1rem;
+            margin-bottom: 1rem;
         }
 
         .info-box ul {
-            margin-right: 1.5rem;
-            color: var(--text-secondary);
-            list-style: none; 
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
         }
 
         .info-box li {
-            margin-bottom: 0.5rem;
-            line-height: 1.8;
             display: flex;
             align-items: center;
+            gap: 0.6rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
         }
 
         .info-box li svg {
-            width: 18px;
-            height: 18px;
-            margin-left: 8px;
-            color: var(--success-color);
+            color: var(--success);
+            flex-shrink: 0;
         }
 
         .step-container {
-            margin-bottom: 2rem;
             display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
+            animation: slideUp 0.4s ease-out;
         }
 
         .step-container.active {
             display: block;
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .step-header {
@@ -181,361 +230,334 @@
             align-items: center;
             gap: 1rem;
             margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
         }
 
         .step-number {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(99, 102, 241, 0.2);
-            border: 2px solid var(--primary-color);
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2rem;
-            color: var(--primary-light);
-            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px var(--shadow-color);
         }
 
         .step-title {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             font-weight: bold;
-            color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: var(--text-main);
         }
 
         .protocol-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .protocol-btn {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            color: var(--text-secondary);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 16px;
+            background: var(--bg-surface);
+            border: 1.5px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 18px;
             cursor: pointer;
-            font-size: 1.2rem;
-            font-weight: bold;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            font-family: 'Arad', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 0.8rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--text-main);
+            font-family: inherit;
         }
 
         .protocol-btn svg {
-            width: 32px;
-            height: 32px;
-            margin: 0;
-        }
-
-        .protocol-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .protocol-btn:hover::before {
-            left: 100%;
+            width: 28px;
+            height: 28px;
+            color: var(--text-secondary);
         }
 
         .protocol-btn.active {
-            background: rgba(99, 102, 241, 0.3);
-            color: white;
-            border-color: var(--primary-color);
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
-            transform: translateY(-2px);
+            border-color: var(--primary);
+            background: rgba(var(--primary-rgb, 59, 130, 246), 0.05);
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb, 59, 130, 246), 0.1);
         }
 
-        .protocol-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        .protocol-btn.active svg {
+            color: var(--primary);
+        }
+
+        .protocol-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .protocol-badge.show {
+            opacity: 1;
         }
 
         .input-group {
-            margin-top: 1rem;
+            margin-bottom: 1.2rem;
         }
 
-        input[type="text"], input[type="number"], textarea {
+        input,
+        textarea {
             width: 100%;
-            padding: 1.2rem;
+            background: var(--input-bg);
+            border: 1.5px solid var(--border-color);
             border-radius: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            color: var(--color-text);
+            padding: 1.1rem;
+            color: var(--text-main);
+            font-family: inherit;
             font-size: 1rem;
-            transition: all 0.3s ease;
-            resize: vertical;
-            font-family: 'Arad', sans-serif;
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb, 59, 130, 246), 0.1);
         }
 
         textarea {
-            min-height: 150px;
-            font-family: 'Courier New', monospace;
-            line-height: 1.6;
-        }
-
-        input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-        }
-
-        input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .next-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin-top: 1.5rem;
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
-            position: relative;
-            overflow: hidden;
-            font-family: 'Arad', sans-serif;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .next-btn svg {
-            margin-left: 0;
-            margin-right: 8px;
-        }
-
-        .next-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
-        }
-
-        .next-btn:disabled {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.4);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .back-btn {
-            background: linear-gradient(135deg, var(--error-color), #b91c1c);
-            color: white;
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            margin-top: 1.5rem;
-            margin-left: 1rem;
-            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
-            position: relative;
-            overflow: hidden;
-            font-family: 'Arad', sans-serif;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .back-btn svg {
-            margin-left: 8px;
-            margin-right: 0;
-        }
-
-        .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(239, 68, 68, 0.4);
-        }
-
-        .convert-btn {
-            background: linear-gradient(135deg, var(--success-color), #059669);
-            width: 100%;
-            padding: 1.2rem;
-            font-size: 1.1rem;
-            justify-content: center;
+            min-height: 120px;
+            resize: vertical;
         }
 
         .button-group {
             display: flex;
-            justify-content: flex-start;
             gap: 1rem;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
         }
 
-        .alert {
-            padding: 1.2rem;
-            border-radius: 16px;
-            margin: 0 1rem 1rem 0;
-            backdrop-filter: blur(20px);
-            border: 1px solid;
-            animation: slideIn 0.5s ease;
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            transform: none;
-            z-index: 1000;
-            min-width: 250px;
-            max-width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            word-wrap: break-word;
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
             display: flex;
             align-items: center;
+            gap: 0.6rem;
+            font-size: 1rem;
+            flex: 1;
+            justify-content: center;
         }
 
-        .alert svg {
-            margin-left: 10px;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 8px 16px -4px rgba(var(--primary-rgb, 59, 130, 246), 0.3);
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--error-color);
-            color: #fca5a5;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: var(--success-color);
-            color: #6ee7b7;
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            max-width: 151px;
         }
 
         .output-section {
-            margin-top: 2rem;
+            margin-top: 2.5rem;
+            background: var(--bg-surface);
+            border: 2px dashed var(--success);
+            border-radius: 20px;
             padding: 2rem;
-            background: rgba(16, 185, 129, 0.1);
-            border: 2px solid var(--success-color);
-            border-radius: 16px;
             display: none;
-            animation: fadeIn 0.5s ease;
         }
 
         .output-section.show {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .output-section h3 {
-            color: var(--success-color);
-            margin-bottom: 1rem;
+        .copy-btn {
+            margin-top: 1rem;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 11px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-            display: inline-flex;
+        .alert {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1.2rem 2rem;
+            border-radius: 18px;
+            background: var(--bg-container);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px var(--shadow-color);
+            z-index: 1000;
+            display: flex;
             align-items: center;
-            font-family: 'Arad', sans-serif;
+            gap: 0.8rem;
+            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .copy-btn svg {
-            margin-left: 8px;
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        .alert-danger {
+            border-right: 5px solid var(--error);
         }
 
-        @media (max-width: 768px) {
+        .alert-success {
+            border-right: 5px solid var(--success);
+        }
+
+        @media (max-width: 640px) {
             .container {
-                width: 95%;
-                padding: 2rem;
+                padding: 1.5rem;
             }
 
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
             }
 
-            .protocol-buttons {
-                grid-template-columns: 1fr;
+            .btn {
+                padding: 0.8rem 1.2rem;
             }
 
-            .alert {
-                min-width: 90%;
-                max-width: 90%;
-                bottom: 0.5rem;
-                right: 0.5rem;
-            }
-
-            .button-group {
-                flex-direction: column-reverse;
+            .toolbar {
+                justify-content: center;
             }
         }
 
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 10px;
+        .social-link {
+            color: var(--primary);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-light);
+        .social-link:hover {
+            transform: translateY(-3px);
+            opacity: 0.8;
+        }
+
+        .social-link svg {
+            width: 24px;
+            height: 24px;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
+        <div class="toolbar">
+            <div class="theme-controls" id="themeControls">
+                <div class="theme-bubble active" style="background: var(--primary-blue)"
+                    onclick="setPrimaryColor('blue')" title="آبی"></div>
+                <div class="theme-bubble" style="background: var(--primary-purple)" onclick="setPrimaryColor('purple')"
+                    title="بنفش"></div>
+                <div class="theme-bubble" style="background: var(--primary-yellow)" onclick="setPrimaryColor('yellow')"
+                    title="زرد"></div>
+                <div class="theme-bubble" style="background: var(--primary-green)" onclick="setPrimaryColor('green')"
+                    title="سبز"></div>
+                <div class="theme-bubble" style="background: var(--primary-red)" onclick="setPrimaryColor('red')"
+                    title="قرمز"></div>
+                <div class="theme-bubble" style="background: var(--primary-orange)" onclick="setPrimaryColor('orange')"
+                    title="نارنجی"></div>
+            </div>
+            <div class="mode-toggle">
+                <button class="mode-btn" onclick="setMode('light')" id="modeLight">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    لایت
+                </button>
+                <button class="mode-btn" onclick="setMode('dark')" id="modeDark">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    دارک
+                </button>
+                <button class="mode-btn active" onclick="setMode('auto')" id="modeAuto">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
+                    </svg>
+                    خودکار
+                </button>
+            </div>
+        </div>
+
         <h1>
-            <svg class="icon" viewBox="0 0 24 24" style="width: 36px; height: 36px;">
+            <svg class="icon" viewBox="0 0 24 24" style="width: 42px; height: 42px;">
                 <path d="M23 4v6h-6"></path>
                 <path d="M1 20v-6h6"></path>
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
-            <span>مبدل کانفیگ به JSON</span>
+            <span>مبدل کانفیگ</span>
         </h1>
 
         <div id="alertContainer"></div>
@@ -546,24 +568,21 @@
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                     <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                پشتیبانی کامل از:
+                پشتیبانی کامل از پروتکل‌ها و شبکه‌ها
             </strong>
             <ul>
+
                 <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    پروتکل‌های VLESS و VMess
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    انتخاب پروتکل هوشمند و خودکار
                 </li>
                 <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    انواع شبکه: TCP, WS, gRPC, H2, xHTTP
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Path, Host, SNI و سایر پارامترها
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    اضافه و حذف کانفیگ‌ها
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    TCP, WS, gRPC, H2, xHTTP
                 </li>
             </ul>
         </div>
@@ -571,33 +590,26 @@
         <div class="step-container active" id="step0">
             <div class="step-header">
                 <div class="step-number">0</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                    </svg>
-                    انتخاب عملیات
-                </div>
+                <div class="step-title">انتخاب عملیات</div>
             </div>
             <div class="protocol-buttons">
                 <button type="button" class="protocol-btn active" onclick="selectMode('add', this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="icon" viewBox="0 0 24 24">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     اضافه کردن کانفیگ
                 </button>
                 <button type="button" class="protocol-btn" onclick="selectMode('delete', this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="icon" viewBox="0 0 24 24">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
                     </svg>
                     حذف کانفیگ
                 </button>
             </div>
             <div class="button-group">
-                <button class="next-btn" onclick="prepareMode()" id="step0Btn">
+                <button class="btn btn-primary" onclick="prepareMode()" id="step0Btn">
                     مرحله بعد
                     <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -610,28 +622,20 @@
         <div class="step-container" id="step1">
             <div class="step-header">
                 <div class="step-number">1</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="4" y1="9" x2="20" y2="9"></line>
-                        <line x1="4" y1="15" x2="20" y2="15"></line>
-                        <line x1="10" y1="3" x2="8" y2="21"></line>
-                        <line x1="16" y1="3" x2="14" y2="21"></line>
-                    </svg>
-                    تعداد کانفیگ‌ها
-                </div>
+                <div class="step-title">تعداد کانفیگ‌ها</div>
             </div>
             <div class="input-group">
-                <input type="number" id="numConfigs" min="1" placeholder="تعداد کانفیگ‌ها را وارد کنید (مثال: 3)">
+                <input type="number" id="numConfigs" min="1" placeholder="تعداد کانفیگ‌ها (مثال: 3)">
             </div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
+                <button class="btn btn-danger" onclick="goBack()">
                     <svg class="icon" viewBox="0 0 24 24">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    مرحله قبل
+                    قبلی
                 </button>
-                <button class="next-btn" onclick="prepareSteps()" id="step1Btn" disabled>
+                <button class="btn btn-primary" onclick="prepareSteps()" id="step1Btn" disabled>
                     مرحله بعد
                     <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -644,270 +648,189 @@
         <div class="step-container" id="stepDelete1">
             <div class="step-header">
                 <div class="step-number">1</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="4" y1="9" x2="20" y2="9"></line>
-                        <line x1="4" y1="15" x2="20" y2="15"></line>
-                        <line x1="10" y1="3" x2="8" y2="21"></line>
-                        <line x1="16" y1="3" x2="14" y2="21"></line>
-                    </svg>
-                    تعداد کانفیگ‌های حذف
-                </div>
+                <div class="step-title">تعداد کانفیگ‌های حذف</div>
             </div>
             <div class="input-group">
-                <input type="number" id="numDeleteConfigs" min="1" placeholder="تعداد کانفیگ‌ها را وارد کنید (مثال: 3)">
+                <input type="number" id="numDeleteConfigs" min="1" placeholder="تعداد حذفیات (مثال: 3)">
             </div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn" onclick="prepareDelete()" id="stepDelete1Btn" disabled>
-                    مرحله بعد
-                    <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                </button>
+                <button class="btn btn-danger" onclick="goBack()">قبلی</button>
+                <button class="btn btn-primary" onclick="prepareDelete()" id="stepDelete1Btn" disabled>بعدی</button>
             </div>
         </div>
 
         <div class="step-container" id="stepDelete2">
             <div class="step-header">
                 <div class="step-number">2</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                    جزئیات حذف کانفیگ‌ها
-                </div>
+                <div class="step-title">جزئیات حذف</div>
             </div>
             <div id="deleteDetailsContainer"></div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn" onclick="goToStep('Delete3')" id="stepDelete2Btn" disabled>
-                    مرحله بعد
-                    <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                </button>
+                <button class="btn btn-danger" onclick="goBack()">قبلی</button>
+                <button class="btn btn-primary" onclick="goToStep('Delete3')" id="stepDelete2Btn" disabled>بعدی</button>
             </div>
         </div>
 
         <div class="step-container" id="stepDelete3">
             <div class="step-header">
                 <div class="step-number">3</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    JSON کد
-                </div>
+                <div class="step-title">JSON پنل</div>
             </div>
             <div class="input-group">
-                <textarea id="marzbanJsonDelete" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
+                <textarea id="marzbanJsonDelete" placeholder="کد JSON پنل را اینجا وارد کنید..."></textarea>
             </div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn convert-btn" onclick="deleteConfigs()" id="deleteBtn" disabled>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                    حذف کانفیگ‌ها
-                </button>
+                <button class="btn btn-danger" onclick="goBack()">قبلی</button>
+                <button class="btn btn-primary" onclick="deleteConfigs()" id="deleteBtn" disabled>اجرای حذف</button>
             </div>
         </div>
+
 
         <div class="step-container" id="step2">
             <div class="step-header">
                 <div class="step-number">2</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                        <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                        <line x1="12" y1="20" x2="12.01" y2="20"></line>
-                    </svg>
-                    نوع پروتکل‌ها
-                </div>
+                <div class="step-title">نام‌های اینباند</div>
             </div>
-            <div id="protocolContainer"></div>
+            <div id="inboundContainer"></div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn" onclick="goToStep(3)" id="step2Btn">
-                    مرحله بعد
-                    <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                </button>
+                <button class="btn btn-danger" onclick="goBack()">قبلی</button>
+                <button class="btn btn-primary" onclick="goToStep(3)" id="step2Btn" disabled>بعدی</button>
             </div>
         </div>
 
         <div class="step-container" id="step3">
             <div class="step-header">
                 <div class="step-number">3</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                    </svg>
-                    نام‌های اینباند
-                </div>
+                <div class="step-title">JSON پنل</div>
             </div>
-            <div id="inboundContainer"></div>
+            <div class="input-group">
+                <textarea id="marzbanJson" placeholder="کد JSON پنل را اینجا وارد کنید..."></textarea>
+            </div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn" onclick="goToStep(4)" id="step3Btn" disabled>
-                    مرحله بعد
-                    <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                </button>
+                <button class="btn btn-danger" onclick="goBack()">قبلی</button>
+                <button class="btn btn-primary" onclick="goToStep(4)" id="step3Btn" disabled>بعدی</button>
             </div>
         </div>
 
         <div class="step-container" id="step4">
             <div class="step-header">
                 <div class="step-number">4</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    JSON کد
-                </div>
-            </div>
-            <div class="input-group">
-                <textarea id="marzbanJson" placeholder="کد JSON را اینجا وارد کنید..."></textarea>
-            </div>
-            <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn" onclick="goToStep(5)" id="step4Btn" disabled>
-                    مرحله بعد
-                    <svg class="icon" viewBox="0 0 24 24" style="transform: rotate(180deg);">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="step-container" id="step5">
-            <div class="step-header">
-                <div class="step-number">5</div>
-                <div class="step-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    کانفیگ‌های مورد نظر
-                </div>
+                <div class="step-title">کانفیگ‌های جدید</div>
             </div>
             <div id="configContainer"></div>
             <div class="button-group">
-                <button class="back-btn" onclick="goBack()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    مرحله قبل
-                </button>
-                <button class="next-btn convert-btn" onclick="convertConfig()" id="convertBtn" disabled>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M23 4v6h-6"></path>
-                        <path d="M1 20v-6h6"></path>
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                    تبدیل کانفیگ
-                </button>
+                <button class="btn btn-danger" onclick="goBack()">قبلی</button>
+                <button class="btn btn-primary" onclick="convertConfig()" id="convertBtn" disabled>تبدیل نهایی</button>
             </div>
         </div>
 
         <div class="output-section" id="outputSection">
-            <h3>
-                <svg class="icon" viewBox="0 0 24 24">
-                    <polyline points="20 6 9 17 4 12"></polyline>
+            <div class="step-header">
+                <div class="step-number" style="background: var(--success)">✓</div>
+                <div class="step-title" style="color: var(--success)">مشاهده خروجی نهایی</div>
+            </div>
+            <div class="input-group">
+                <textarea id="finalOutput" readonly style="border-color: var(--success)"></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="copy-btn" onclick="copyToClipboard('finalOutput')">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    کپی کردن خروجی
+                </button>
+                <button class="copy-btn" style="background: var(--primary)" onclick="location.reload()">
+                    شروع دوباره
+                </button>
+            </div>
+        </div>
+
+        <div class="social-links">
+            <a href="https://github.com/ipcloudflaretamiz/Config-converter" target="_blank" class="social-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path
+                        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                    </path>
                 </svg>
-                JSON نهایی
-            </h3>
-            <textarea id="finalOutput" readonly></textarea>
-            <button class="copy-btn" onclick="copyToClipboard('finalOutput')">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                گیت‌هاب
+            </a>
+            <a href="https://t.me/ipcloudflaretamiz" target="_blank" class="social-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
-                کپی کردن
-            </button>
+                تلگرام
+            </a>
         </div>
     </div>
-
     <script>
-        let selectedProtocols = [];
+        let detectedProtocols = [];
         let numConfigs = 0;
         let numDeletes = 0;
         let currentStep = 0;
         let selectedMode = 'add';
         let stepHistory = [];
 
-        window.addEventListener('load', function() {
+        function setPrimaryColor(colorName) {
+            const colors = {
+                blue: { hex: '#3b82f6', rgb: '59, 130, 246' },
+                purple: { hex: '#8b5cf6', rgb: '139, 92, 246' },
+                yellow: { hex: '#eab308', rgb: '234, 179, 8' },
+                green: { hex: '#22c55e', rgb: '34, 197, 94' },
+                red: { hex: '#ef4444', rgb: '239, 68, 68' },
+                orange: { hex: '#f97316', rgb: '249, 115, 22' }
+            };
+            const selected = colors[colorName] || colors.blue;
+            document.documentElement.style.setProperty('--primary', selected.hex);
+            document.documentElement.style.setProperty('--primary-rgb', selected.rgb);
+            localStorage.setItem('config-primary-color', colorName);
+            document.querySelectorAll('.theme-bubble').forEach(b => b.classList.remove('active'));
+            const activeBubble = document.querySelector(`.theme-bubble[onclick*="${colorName}"]`);
+            if (activeBubble) activeBubble.classList.add('active');
+        }
+
+        function setMode(mode) {
+            const html = document.documentElement;
+            const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            if (mode === 'auto') {
+                document.getElementById('modeAuto').classList.add('active');
+                html.setAttribute('data-theme', darkQuery.matches ? 'dark' : 'light');
+                localStorage.removeItem('config-ui-mode');
+            } else {
+                const btnId = mode === 'dark' ? 'modeDark' : 'modeLight';
+                document.getElementById(btnId).classList.add('active');
+                html.setAttribute('data-theme', mode);
+                localStorage.setItem('config-ui-mode', mode);
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('config-ui-mode')) {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+            }
+        });
+
+        window.addEventListener('load', function () {
+            const savedColor = localStorage.getItem('config-primary-color') || 'blue';
+            setPrimaryColor(savedColor);
+            const savedMode = localStorage.getItem('config-ui-mode') || 'auto';
+            setMode(savedMode);
             stepHistory = [];
+            resetUI();
+        });
+
+        function resetUI() {
             document.getElementById('outputSection').classList.remove('show');
             document.getElementById('outputSection').style.display = 'none';
             document.getElementById('finalOutput').value = '';
             const steps = document.querySelectorAll('.step-container');
             steps.forEach(step => {
-                if (step.id !== 'step0') {
-                    step.classList.remove('active');
-                    step.style.display = 'none';
-                } else {
-                    step.classList.add('active');
-                    step.style.display = 'block';
-                }
+                if (step.id !== 'step0') { step.classList.remove('active'); step.style.display = 'none'; }
+                else { step.classList.add('active'); step.style.display = 'block'; }
             });
             document.getElementById('numConfigs').value = '';
             document.getElementById('step1Btn').disabled = true;
@@ -915,7 +838,7 @@
             if (document.getElementById('stepDelete1Btn')) document.getElementById('stepDelete1Btn').disabled = true;
             if (document.getElementById('marzbanJsonDelete')) document.getElementById('marzbanJsonDelete').value = '';
             if (document.getElementById('deleteBtn')) document.getElementById('deleteBtn').disabled = true;
-        });
+        }
 
         function selectMode(mode, element) {
             selectedMode = mode;
@@ -925,70 +848,209 @@
         }
 
         function prepareMode() {
-            if (selectedMode === 'add') {
-                goToStep(1);
-            } else if (selectedMode === 'delete') {
-                goToStep('Delete1');
+            if (selectedMode === 'add') goToStep(1);
+            else if (selectedMode === 'delete') goToStep('Delete1');
+        }
+
+        function goToStep(step) {
+            if (step === 4) {
+                if (!document.getElementById('marzbanJson').value.trim()) { showAlert('لطفاً کد JSON را وارد کنید', 'danger'); return; }
+                generateConfigs();
+            }
+            stepHistory.push(currentStep);
+            const currentId = isNaN(currentStep) ? `step${currentStep}` : `step${currentStep}`;
+            const currentStepEl = document.getElementById(currentId);
+            if (currentStepEl) { currentStepEl.classList.remove('active'); currentStepEl.style.display = 'none'; }
+            const nextStepId = isNaN(step) ? `step${step}` : `step${step}`;
+            const nextStepEl = document.getElementById(nextStepId);
+            if (nextStepEl) { nextStepEl.classList.add('active'); nextStepEl.style.display = 'block'; }
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBack() {
+            if (stepHistory.length > 0) {
+                const prevStep = stepHistory.pop();
+                const currentId = isNaN(currentStep) ? `step${currentStep}` : `step${currentStep}`;
+                const currentStepEl = document.getElementById(currentId);
+                if (currentStepEl) { currentStepEl.classList.remove('active'); currentStepEl.style.display = 'none'; }
+                const prevStepId = isNaN(prevStep) ? `step${prevStep}` : `step${prevStep}`;
+                const prevStepEl = document.getElementById(prevStepId);
+                if (prevStepEl) { prevStepEl.classList.add('active'); prevStepEl.style.display = 'block'; }
+                currentStep = prevStep;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        document.getElementById('numConfigs').addEventListener('input', function() {
+        function showAlert(message, type = 'danger') {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => { alertContainer.innerHTML = ''; }, 4000);
+        }
+
+        function copyToClipboard(id) {
+            const el = document.getElementById(id);
+            el.select();
+            document.execCommand('copy');
+            showAlert('کپی شد!', 'success');
+        }
+
+        document.getElementById('numConfigs').addEventListener('input', function () {
             const val = parseInt(this.value);
             document.getElementById('step1Btn').disabled = isNaN(val) || val < 1;
         });
 
-        if (document.getElementById('numDeleteConfigs')) {
-            document.getElementById('numDeleteConfigs').addEventListener('input', function() {
-                const val = parseInt(this.value);
-                document.getElementById('stepDelete1Btn').disabled = isNaN(val) || val < 1;
-            });
-        }
-
-        document.getElementById('marzbanJson').addEventListener('input', function() {
-            document.getElementById('step4Btn').disabled = !this.value.trim();
+        document.getElementById('marzbanJson').addEventListener('input', function () {
+            document.getElementById('step3Btn').disabled = !this.value.trim();
         });
-
-        if (document.getElementById('marzbanJsonDelete')) {
-            document.getElementById('marzbanJsonDelete').addEventListener('input', function() {
-                document.getElementById('deleteBtn').disabled = !this.value.trim();
-            });
-        }
 
         function prepareSteps() {
             numConfigs = parseInt(document.getElementById('numConfigs').value);
-            if (isNaN(numConfigs) || numConfigs < 1) {
-                showAlert('لطفاً تعداد معتبر وارد کنید', 'danger');
-                return;
-            }
-            generateProtocols();
+            if (isNaN(numConfigs) || numConfigs < 1) { showAlert('لطفاً تعداد معتبر وارد کنید', 'danger'); return; }
             generateInbounds();
             goToStep(2);
         }
 
+        function generateInbounds() {
+            const container = document.getElementById('inboundContainer');
+            let html = '';
+            for (let i = 0; i < numConfigs; i++) {
+                html += `<div class="input-group" style="margin-bottom: 1rem;"><input type="text" id="inboundName${i}" placeholder="نام اینباند شماره ${i + 1} (مثال: VLESS+TCP${i + 1})"></div>`;
+            }
+            container.innerHTML = html;
+            for (let i = 0; i < numConfigs; i++) {
+                document.getElementById(`inboundName${i}`).addEventListener('input', checkStep3);
+            }
+            checkStep3();
+        }
+
+        function checkStep3() {
+            const allFilled = Array.from(document.querySelectorAll('[id^="inboundName"]')).every(inp => inp.value.trim() !== '');
+            document.getElementById('step2Btn').disabled = !allFilled;
+        }
+
+        function generateConfigs() {
+            const container = document.getElementById('configContainer');
+            detectedProtocols = new Array(numConfigs).fill('unknown');
+            let html = '';
+            for (let i = 0; i < numConfigs; i++) {
+                const inboundName = document.getElementById(`inboundName${i}`).value.trim() || `شماره ${i + 1}`;
+                html += `
+                    <div class="input-group" style="margin-bottom: 2rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--primary);">کانفیگ مربوط به اینباند: ${inboundName}</label>
+                        <textarea id="configInput${i}" placeholder="کانفیگ را اینجا وارد کنید..."></textarea>
+                        <div id="badge${i}" class="protocol-badge">
+                            <span>پروتکل شناسایی شده: </span>
+                            <strong id="protocolName${i}">نامشخص</strong>
+                        </div>
+                    </div>`;
+            }
+            container.innerHTML = html;
+            for (let i = 0; i < numConfigs; i++) {
+                document.getElementById(`configInput${i}`).addEventListener('input', function () {
+                    const protocol = detectProtocol(this.value);
+                    detectedProtocols[i] = protocol;
+                    const badge = document.getElementById(`badge${i}`);
+                    const nameSpan = document.getElementById(`protocolName${i}`);
+                    if (protocol !== 'unknown') {
+                        nameSpan.innerText = protocol.toUpperCase();
+                        badge.classList.add('show');
+                    } else { badge.classList.remove('show'); }
+                    checkStep4();
+                });
+            }
+            checkStep4();
+        }
+
+        function checkStep4() {
+            const allFilled = Array.from(document.querySelectorAll('[id^="configInput"]')).every(inp => inp.value.trim() !== '');
+            const allDetected = detectedProtocols.every(p => p !== 'unknown');
+            document.getElementById('convertBtn').disabled = !(allFilled && allDetected);
+        }
+
+        function detectProtocol(s) {
+            s = s.trim();
+            if (s.startsWith('vless://')) return 'vless';
+            if (s.startsWith('vmess://')) return 'vmess';
+            if (s.startsWith('trojan://')) return 'trojan';
+            if (s.startsWith('ss://')) return 'shadowsocks';
+            if (s.startsWith('wireguard://') || s.startsWith('wg://') || s.includes('[Interface]')) return 'wireguard';
+            return 'unknown';
+        }
+
+        function generateUniqueTag(base, existing) {
+            let t = base, c = 1;
+            while (existing.includes(t)) { t = `${base}_${c}`; c++; }
+            return t;
+        }
+
+        function convertConfig() {
+            try {
+                const marzbanConfig = JSON.parse(document.getElementById('marzbanJson').value.trim());
+                if (!marzbanConfig.outbounds) marzbanConfig.outbounds = [];
+                const existingTags = marzbanConfig.outbounds.map(ob => ob.tag || '');
+                if (!marzbanConfig.routing) marzbanConfig.routing = { rules: [] };
+                if (!marzbanConfig.routing.rules) marzbanConfig.routing.rules = [];
+
+                for (let i = 0; i < numConfigs; i++) {
+                    const inboundName = document.getElementById(`inboundName${i}`).value.trim();
+                    const configStr = document.getElementById(`configInput${i}`).value.trim();
+                    const protocol = detectedProtocols[i];
+                    if (!configStr || protocol === 'unknown') continue;
+
+                    const uniqueTag = generateUniqueTag(inboundName, existingTags);
+                    existingTags.push(uniqueTag);
+
+                    let parsed;
+                    if (protocol === 'vless') parsed = parseVlessConfig(configStr, uniqueTag);
+                    else if (protocol === 'vmess') parsed = parseVmessConfig(configStr, uniqueTag);
+                    else if (protocol === 'trojan') parsed = parseTrojanConfig(configStr, uniqueTag);
+                    else if (protocol === 'shadowsocks') parsed = parseSSConfig(configStr, uniqueTag);
+                    else if (protocol === 'wireguard') parsed = parseWireGuardConfig(configStr, uniqueTag);
+
+                    if (parsed) {
+                        marzbanConfig.outbounds.push(parsed);
+                        const ruleIdx = marzbanConfig.routing.rules.findIndex(r => r.inboundTag && r.inboundTag.includes(inboundName));
+                        if (ruleIdx !== -1) marzbanConfig.routing.rules[ruleIdx].outboundTag = uniqueTag;
+                        else marzbanConfig.routing.rules.push({ type: "field", inboundTag: [inboundName], outboundTag: uniqueTag });
+                    }
+                }
+                document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
+                document.getElementById('outputSection').classList.add('show');
+                document.getElementById('outputSection').style.display = 'block';
+                document.getElementById('step4').style.display = 'none';
+                showAlert('کانفیگ‌ها با موفقیت اضافه شدند!', 'success');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) { showAlert('خطا در تبدیل: ' + e.message, 'danger'); }
+        }
+
+        if (document.getElementById('numDeleteConfigs')) {
+            document.getElementById('numDeleteConfigs').addEventListener('input', function () {
+                const val = parseInt(this.value);
+                document.getElementById('stepDelete1Btn').disabled = isNaN(val) || val < 1;
+            });
+        }
+        if (document.getElementById('marzbanJsonDelete')) {
+            document.getElementById('marzbanJsonDelete').addEventListener('input', function () {
+                document.getElementById('deleteBtn').disabled = !this.value.trim();
+            });
+        }
+
         function prepareDelete() {
             numDeletes = parseInt(document.getElementById('numDeleteConfigs').value);
-            if (isNaN(numDeletes) || numDeletes < 1) {
-                showAlert('لطفاً تعداد معتبر وارد کنید', 'danger');
-                return;
-            }
+            if (isNaN(numDeletes) || numDeletes < 1) { showAlert('لطفاً تعداد معتبر وارد کنید', 'danger'); return; }
             generateDeleteDetails();
             goToStep('Delete2');
         }
 
         function generateDeleteDetails() {
             const container = document.getElementById('deleteDetailsContainer');
-            container.innerHTML = '';
+            let html = '';
             for (let i = 0; i < numDeletes; i++) {
-                container.innerHTML += `
-                    <div style="margin-bottom: 1rem;">
-                        <div class="input-group">
-                            <input type="text" id="deleteInboundName${i}" placeholder="نام اینباند شماره ${i + 1} (مثال: VLESS+HTTPUPGRADE+NONE+59505)">
-                        </div>
-                        <div class="input-group">
-                            <input type="text" id="deleteUuid${i}" placeholder="UUID شماره ${i + 1} (مثال: 733042a4-b2ff-4360-8d68-2761b848a81e)">
-                        </div>
-                    </div>
-                `;
+                html += `<div style="margin-bottom: 1rem;"><div class="input-group"><input type="text" id="deleteInboundName${i}" placeholder="نام اینباند شماره ${i + 1}"></div><div class="input-group"><input type="text" id="deleteUuid${i}" placeholder="UUID (vless|vmess) / secretKey(wireguard) / method(shadowsocks) / password(trojan) شماره ${i + 1}"></div></div>`;
+            }
+            container.innerHTML = html;
+            for (let i = 0; i < numDeletes; i++) {
                 document.getElementById(`deleteInboundName${i}`).addEventListener('input', checkDeleteDetails);
                 document.getElementById(`deleteUuid${i}`).addEventListener('input', checkDeleteDetails);
             }
@@ -1004,510 +1066,251 @@
             document.getElementById('stepDelete2Btn').disabled = !allFilled;
         }
 
-        function generateProtocols() {
-            const container = document.getElementById('protocolContainer');
-            container.innerHTML = '';
-            selectedProtocols = new Array(numConfigs).fill('vless');
-            for (let i = 0; i < numConfigs; i++) {
-                container.innerHTML += `
-                    <div style="margin-bottom: 1rem;">
-                        <label>پروتکل شماره ${i + 1}</label>
-                        <div class="protocol-buttons">
-                            <button type="button" class="protocol-btn active" onclick="selectProtocol(${i}, 'vless', this)">VLESS</button>
-                            <button type="button" class="protocol-btn" onclick="selectProtocol(${i}, 'vmess', this)">VMess</button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function generateInbounds() {
-            const container = document.getElementById('inboundContainer');
-            container.innerHTML = '';
-            for (let i = 0; i < numConfigs; i++) {
-                container.innerHTML += `
-                    <div class="input-group" style="margin-bottom: 1rem;">
-                        <input type="text" id="inboundName${i}" placeholder="نام اینباند شماره ${i + 1} (مثال: VLESS+TCP${i + 1})">
-                    </div>
-                `;
-                document.getElementById(`inboundName${i}`).addEventListener('input', checkStep3);
-            }
-            checkStep3();
-        }
-
-        function checkStep3() {
-            const allFilled = Array.from(document.querySelectorAll('[id^="inboundName"]')).every(inp => inp.value.trim() !== '');
-            document.getElementById('step3Btn').disabled = !allFilled;
-        }
-
-        function generateConfigs() {
-            const container = document.getElementById('configContainer');
-            container.innerHTML = '';
-            for (let i = 0; i < numConfigs; i++) {
-                const protocol = selectedProtocols[i];
-                container.innerHTML += `
-                    <div class="input-group" style="margin-bottom: 1rem;">
-                        <textarea id="configInput${i}" placeholder="کانفیگ ${protocol.toUpperCase()} شماره ${i + 1} را وارد کنید..."></textarea>
-                    </div>
-                `;
-                document.getElementById(`configInput${i}`).addEventListener('input', checkStep5);
-            }
-            checkStep5();
-        }
-
-        function checkStep5() {
-            const allFilled = Array.from(document.querySelectorAll('[id^="configInput"]')).every(inp => inp.value.trim() !== '');
-            document.getElementById('convertBtn').disabled = !allFilled;
-        }
-
-        function selectProtocol(index, protocol, element) {
-            selectedProtocols[index] = protocol;
-            const buttons = element.parentNode.querySelectorAll('.protocol-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function goToStep(step) {
-            if (step === 5) {
-                if (!document.getElementById('marzbanJson').value.trim()) {
-                    showAlert('لطفاً کد JSON را وارد کنید', 'danger');
-                    return;
-                }
-                generateConfigs();
-            }
-
-            stepHistory.push(currentStep);
-
-            const currentId = typeof currentStep === 'number' ? `step${currentStep}` : `step${currentStep}`;
-            const currentStepEl = document.getElementById(currentId);
-            currentStepEl.classList.remove('active');
-            currentStepEl.style.display = 'none';
-
-            const nextStepId = typeof step === 'number' ? `step${step}` : `step${step}`;
-            const nextStepEl = document.getElementById(nextStepId);
-            nextStepEl.classList.add('active');
-            nextStepEl.style.display = 'block';
-
-            currentStep = step;
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function goBack() {
-            if (stepHistory.length > 0) {
-                const prevStep = stepHistory.pop();
-                const currentId = typeof currentStep === 'number' ? `step${currentStep}` : `step${currentStep}`;
-                const currentStepEl = document.getElementById(currentId);
-                currentStepEl.classList.remove('active');
-                currentStepEl.style.display = 'none';
-
-                const prevStepId = typeof prevStep === 'number' ? `step${prevStep}` : `step${prevStep}`;
-                const prevStepEl = document.getElementById(prevStepId);
-                prevStepEl.classList.add('active');
-                prevStepEl.style.display = 'block';
-
-                currentStep = prevStep;
-
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        function showAlert(message, type = 'danger') {
-            const alertContainer = document.getElementById('alertContainer');
-
-            let iconSvg = '';
-            if (type === 'danger') {
-                iconSvg = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
-            } else {
-                iconSvg = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-            }
-            alertContainer.innerHTML = `<div class="alert alert-${type}">${iconSvg} ${message}</div>`;
-            setTimeout(() => {
-                alertContainer.innerHTML = '';
-            }, 4000);
-        }
-
-        function parseVlessConfig(configStr, customTag) {
-            try {
-                if (configStr.startsWith('vless://')) {
-                    const url = new URL(configStr);
-                    const id = url.username;
-                    const address = url.hostname;
-                    const port = parseInt(url.port);
-                    const params = new URLSearchParams(url.search);
-
-                    const network = params.get('type') || "tcp";
-                    const security = params.get('security') || "none";
-                    const headerType = params.get('headerType') || "none";
-                    const host = params.get('host') || "";
-                    const path = params.get('path') || "/";
-                    const sni = params.get('sni') || "";
-                    const alpn = params.get('alpn') || "";
-                    const fp = params.get('fp') || "";
-                    const pbk = params.get('pbk') || "";
-                    const sid = params.get('sid') || "";
-                    const serviceName = params.get('serviceName') || "";
-
-                    let streamSettings = {
-                        network: network,
-                        security: security
-                    };
-
-                    if (network === "tcp") {
-                        streamSettings.tcpSettings = {
-                            header: {
-                                type: headerType
-                            }
-                        };
-
-                        if (headerType === "http" && host) {
-                            streamSettings.tcpSettings.header.request = {
-                                headers: {
-                                    Host: [host]
-                                },
-                                path: [path]
-                            };
-                        }
-                    }
-
-                    else if (network === "ws") {
-                        streamSettings.wsSettings = {
-                            path: path || "/",
-                            headers: {}
-                        };
-                        if (host) {
-                            streamSettings.wsSettings.headers.Host = host;
-                        }
-                    }
-
-                    else if (network === "grpc") {
-                        streamSettings.grpcSettings = {
-                            serviceName: serviceName || ""
-                        };
-                    }
-
-                    else if (network === "h2") {
-                        streamSettings.httpSettings = {
-                            path: path || "/",
-                            host: host ? [host] : []
-                        };
-                    }
-
-                    else if (network === "xhttp") {
-                        streamSettings.xhttpSettings = {
-                            path: path || "/",
-                            host: host || ""
-                        };
-                    }
-
-                    if (security === "tls") {
-                        streamSettings.tlsSettings = {
-                            serverName: sni || address,
-                            alpn: alpn ? alpn.split(',') : [],
-                            fingerprint: fp || ""
-                        };
-                    }
-
-                    else if (security === "reality") {
-                        streamSettings.realitySettings = {
-                            serverName: sni || "",
-                            fingerprint: fp || "chrome",
-                            shortId: sid || "",
-                            publicKey: pbk || ""
-                        };
-                    }
-
-                    return {
-                        protocol: "vless",
-                        settings: {
-                            vnext: [
-                                {
-                                    address: address,
-                                    port: port,
-                                    users: [
-                                        {
-                                            id: id,
-                                            flow: params.get('flow') || "",
-                                            encryption: params.get('encryption') || "none"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        tag: customTag,
-                        streamSettings: streamSettings
-                    };
-                }
-
-                const parsed = JSON.parse(configStr);
-                parsed.tag = customTag;
-                return parsed;
-            } catch (error) {
-                throw new Error('فرمت کانفیگ VLESS نامعتبر است: ' + error.message);
-            }
-        }
-
-        function parseVmessConfig(configStr, customTag) {
-            try {
-                if (configStr.startsWith('vmess://')) {
-                    const base64Data = configStr.replace('vmess://', '');
-                    const decodedData = atob(base64Data);
-                    const vmessData = JSON.parse(decodedData);
-
-                    let streamSettings = {
-                        network: vmessData.net || "tcp",
-                        security: vmessData.tls || "none"
-                    };
-
-                    if (streamSettings.network === "tcp") {
-                        streamSettings.tcpSettings = {
-                            header: {
-                                type: vmessData.type || "none"
-                            }
-                        };
-
-                        if (vmessData.type === "http" && vmessData.host) {
-                            streamSettings.tcpSettings.header.request = {
-                                headers: {
-                                    Host: [vmessData.host]
-                                },
-                                path: [vmessData.path || "/"]
-                            };
-                        }
-                    }
-
-                    else if (streamSettings.network === "ws") {
-                        streamSettings.wsSettings = {
-                            path: vmessData.path || "/",
-                            headers: {}
-                        };
-                        if (vmessData.host) {
-                            streamSettings.wsSettings.headers.Host = vmessData.host;
-                        }
-                    }
-
-                    else if (streamSettings.network === "grpc") {
-                        streamSettings.grpcSettings = {
-                            serviceName: vmessData.path || ""
-                        };
-                    }
-
-                    else if (streamSettings.network === "h2") {
-                        streamSettings.httpSettings = {
-                            path: vmessData.path || "/",
-                            host: vmessData.host ? [vmessData.host] : []
-                        };
-                    }
-
-                    else if (streamSettings.network === "xhttp") {
-                        streamSettings.xhttpSettings = {
-                            path: vmessData.path || "/",
-                            host: vmessData.host || ""
-                        };
-                    }
-
-                    if (streamSettings.security === "tls") {
-                        streamSettings.tlsSettings = {
-                            serverName: vmessData.sni || vmessData.add || "",
-                            alpn: vmessData.alpn ? vmessData.alpn.split(',') : [],
-                            fingerprint: vmessData.fp || ""
-                        };
-                    }
-
-                    return {
-                        protocol: "vmess",
-                        settings: {
-                            vnext: [
-                                {
-                                    address: vmessData.add,
-                                    port: parseInt(vmessData.port),
-                                    users: [
-                                        {
-                                            id: vmessData.id,
-                                            alterId: parseInt(vmessData.aid) || 0,
-                                            security: vmessData.scy || "auto"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        tag: customTag,
-                        streamSettings: streamSettings
-                    };
-                }
-
-                const parsed = JSON.parse(configStr);
-                parsed.tag = customTag;
-                return parsed;
-            } catch (error) {
-                throw new Error('فرمت کانفیگ VMess نامعتبر است: ' + error.message);
-            }
-        }
-
-        function generateUniqueTag(baseTag, existingTags) {
-            let tag = baseTag;
-            let counter = 1;
-
-            while (existingTags.includes(tag)) {
-                tag = `${baseTag}_${counter}`;
-                counter++;
-            }
-
-            return tag;
-        }
-
-        function convertConfig() {
-            try {
-                const marzbanJsonStr = document.getElementById('marzbanJson').value.trim();
-                const marzbanConfig = JSON.parse(marzbanJsonStr);
-
-                if (!marzbanConfig.outbounds) {
-                    marzbanConfig.outbounds = [];
-                }
-
-                const existingTags = marzbanConfig.outbounds.map(ob => ob.tag || '');
-
-                if (!marzbanConfig.routing) {
-                    marzbanConfig.routing = { rules: [] };
-                }
-
-                if (!marzbanConfig.routing.rules) {
-                    marzbanConfig.routing.rules = [];
-                }
-
-                for (let i = 0; i < numConfigs; i++) {
-                    const inboundName = document.getElementById(`inboundName${i}`).value.trim();
-                    const configStr = document.getElementById(`configInput${i}`).value.trim();
-
-                    if (!configStr) {
-                        showAlert(`کانفیگ شماره ${i + 1} خالی است`, 'danger');
-                        continue;
-                    }
-
-                    const protocol = selectedProtocols[i];
-                    const uniqueTag = generateUniqueTag(inboundName, existingTags);
-                    existingTags.push(uniqueTag);
-
-                    let parsedConfig;
-                    if (protocol === 'vless') {
-                        parsedConfig = parseVlessConfig(configStr, uniqueTag);
-                    } else if (protocol === 'vmess') {
-                        parsedConfig = parseVmessConfig(configStr, uniqueTag);
-                    }
-
-                    marzbanConfig.outbounds.push(parsedConfig);
-
-                    const existingRuleIndex = marzbanConfig.routing.rules.findIndex(
-                        rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
-                    );
-
-                    if (existingRuleIndex !== -1) {
-                        marzbanConfig.routing.rules[existingRuleIndex].outboundTag = uniqueTag;
-                    } else {
-                        marzbanConfig.routing.rules.push({
-                            type: "field",
-                            inboundTag: [inboundName],
-                            outboundTag: uniqueTag
-                        });
-                    }
-                }
-
-                document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
-                document.getElementById('outputSection').classList.add('show');
-                document.getElementById('outputSection').style.display = 'block';
-                document.getElementById('step5').style.display = 'none';
-
-                showAlert('کانفیگ‌ها با موفقیت اضافه شدند!', 'success');
-
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            } catch (error) {
-                showAlert('خطا در تبدیل کانفیگ: ' + error.message, 'danger');
-                console.error(error);
-            }
-        }
-
         function deleteConfigs() {
             try {
-                const marzbanJsonStr = document.getElementById('marzbanJsonDelete').value.trim();
-                const marzbanConfig = JSON.parse(marzbanJsonStr);
-
-                if (!marzbanConfig.outbounds || !marzbanConfig.routing || !marzbanConfig.routing.rules) {
-                    throw new Error('ساختار JSON نامعتبر است');
-                }
-
+                const marzbanConfig = JSON.parse(document.getElementById('marzbanJsonDelete').value.trim());
                 for (let i = 0; i < numDeletes; i++) {
                     const inboundName = document.getElementById(`deleteInboundName${i}`).value.trim();
-                    const uuid = document.getElementById(`deleteUuid${i}`).value.trim();
+                    const searchKey = document.getElementById(`deleteUuid${i}`).value.trim();
+                    const ruleIdx = marzbanConfig.routing.rules.findIndex(r => r.inboundTag && r.inboundTag.includes(inboundName));
+                    if (ruleIdx === -1) continue;
+                    const outboundTag = marzbanConfig.routing.rules[ruleIdx].outboundTag;
+                    const outboundIdx = marzbanConfig.outbounds.findIndex(ob => ob.tag === outboundTag);
+                    if (outboundIdx === -1) continue;
 
-                    const ruleIndex = marzbanConfig.routing.rules.findIndex(
-                        rule => rule.inboundTag && rule.inboundTag.includes(inboundName)
-                    );
+                    let found = false;
+                    const outbound = marzbanConfig.outbounds[outboundIdx];
+                    const protocol = outbound.protocol;
 
-                    if (ruleIndex === -1) {
-                        throw new Error(`رول مربوطه برای ${inboundName} یافت نشد`);
+                    if (protocol === 'vless' || protocol === 'vmess') {
+                        if (outbound.settings && outbound.settings.vnext) {
+                            const users = outbound.settings.vnext[0].users;
+                            const userIdx = users.findIndex(u => u.id === searchKey);
+                            if (userIdx !== -1) {
+                                if (users.length > 1) users.splice(userIdx, 1);
+                                else found = true;
+                            }
+                        }
+                    } else if (protocol === 'trojan') {
+                        if (outbound.settings && outbound.settings.servers) {
+                            const servers = outbound.settings.servers;
+                            const srvIdx = servers.findIndex(s => s.password === searchKey);
+                            if (srvIdx !== -1) {
+                                if (servers.length > 1) servers.splice(srvIdx, 1);
+                                else found = true;
+                            }
+                        }
+                    } else if (protocol === 'shadowsocks') {
+                        if (outbound.settings && outbound.settings.servers) {
+                            const servers = outbound.settings.servers;
+                            const srvIdx = servers.findIndex(s => s.method === searchKey);
+                            if (srvIdx !== -1) {
+                                if (servers.length > 1) servers.splice(srvIdx, 1);
+                                else found = true;
+                            }
+                        }
+                    } else if (protocol === 'wireguard') {
+                        if (outbound.settings && outbound.settings.secretKey === searchKey) {
+                            found = true;
+                        }
                     }
 
-                    const outboundTag = marzbanConfig.routing.rules[ruleIndex].outboundTag;
-
-                    const outboundIndex = marzbanConfig.outbounds.findIndex(
-                        ob => ob.tag === outboundTag
-                    );
-
-                    if (outboundIndex === -1) {
-                        throw new Error(`اوت‌باند مربوطه برای ${inboundName} یافت نشد`);
-                    }
-
-                    const users = marzbanConfig.outbounds[outboundIndex].settings.vnext[0].users;
-                    const userIndex = users.findIndex(user => user.id === uuid);
-
-                    if (userIndex === -1) {
-                        throw new Error(`UUID مربوطه برای ${inboundName} یافت نشد`);
-                    }
-
-                    if (users.length > 1) {
-                        users.splice(userIndex, 1);
-                    } else {
-                        marzbanConfig.outbounds.splice(outboundIndex, 1);
-                        marzbanConfig.routing.rules.splice(ruleIndex, 1);
+                    if (found) {
+                        marzbanConfig.outbounds.splice(outboundIdx, 1);
+                        marzbanConfig.routing.rules.splice(ruleIdx, 1);
                     }
                 }
-
                 document.getElementById('finalOutput').value = JSON.stringify(marzbanConfig, null, 2);
                 document.getElementById('outputSection').classList.add('show');
                 document.getElementById('outputSection').style.display = 'block';
                 document.getElementById('stepDelete3').style.display = 'none';
-
                 showAlert('کانفیگ‌ها با موفقیت حذف شدند!', 'success');
-
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            } catch (error) {
-                showAlert('خطا در حذف کانفیگ: ' + error.message, 'danger');
-                console.error(error);
-            }
+            } catch (e) { showAlert('خطا در حذف: ' + e.message, 'danger'); }
         }
 
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.value;
+        function parseVlessConfig(s, tag) {
+            try {
+                const url = new URL(s);
+                const p = new URLSearchParams(url.search);
+                const sec = p.get('security') || "none", net = p.get('type') || "tcp";
+                let stream = { network: net, security: sec };
+                if (net === "tcp") {
+                    stream.tcpSettings = { header: { type: p.get('headerType') || "none" } };
+                    if (p.get('headerType') === "http") stream.tcpSettings.header.request = { headers: { Host: [p.get('host') || ""] }, path: [p.get('path') || "/"] };
+                } else if (net === "ws") stream.wsSettings = { path: p.get('path') || "/", headers: { Host: p.get('host') || "" } };
+                else if (net === "grpc") stream.grpcSettings = { serviceName: p.get('serviceName') || "" };
+                else if (net === "httpupgrade") stream.httpupgradeSettings = { path: p.get('path') || "/", host: p.get('host') || "" };
+                else if (net === "xhttp") stream.xhttpSettings = { path: p.get('path') || "/", host: p.get('host') || "/", mode: p.get('mode') || "auto" };
+                else if (net === "mkcp") stream.kcpSettings = { header: { type: p.get('headerType') || "none" } };
 
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showAlert('کپی شد!', 'success');
-                }).catch(err => {
-                    showAlert('خطا در کپی کردن', 'danger');
-                });
-            } else {
-                element.select();
-                try {
-                    document.execCommand('copy');
-                    showAlert('کپی شد!', 'success');
-                } catch (err) {
-                    showAlert('خطا در کپی کردن', 'danger');
+                if (sec === "tls") stream.tlsSettings = { serverName: p.get('sni') || url.hostname, alpn: p.get('alpn') ? p.get('alpn').split(',') : [] };
+                else if (sec === "reality") stream.realitySettings = { serverName: p.get('sni') || "", fingerprint: p.get('fp') || "chrome", shortId: p.get('sid') || "", publicKey: p.get('pbk') || "", spiderX: p.get('spx') || "" };
+
+                return { protocol: "vless", settings: { vnext: [{ address: url.hostname, port: parseInt(url.port), users: [{ id: url.username, flow: p.get('flow') || "", encryption: "none" }] }] }, tag, streamSettings: stream };
+            } catch (e) { throw new Error('VLESS Parse Error'); }
+        }
+
+        function parseVmessConfig(s, tag) {
+            try {
+                const d = JSON.parse(atob(s.replace('vmess://', '')));
+                let stream = { network: d.net || "tcp", security: d.tls || "none" };
+                if (stream.network === "ws") stream.wsSettings = { path: d.path || "/", headers: { Host: d.host || "" } };
+                else if (stream.network === "grpc") stream.grpcSettings = { serviceName: d.path || "" };
+                else if (stream.network === "httpupgrade") stream.httpupgradeSettings = { path: d.path || "/", host: d.host || "" };
+                else if (stream.network === "xhttp") stream.xhttpSettings = { path: d.path || "/", host: d.host || "/", mode: "auto" };
+                else if (stream.network === "mkcp") stream.kcpSettings = { header: { type: d.type || "none" } };
+
+                if (stream.security === "tls") stream.tlsSettings = { serverName: d.sni || d.add, alpn: d.alpn ? d.alpn.split(',') : [] };
+                else if (stream.security === "reality") stream.realitySettings = { serverName: d.sni || "", fingerprint: d.fp || "chrome", shortId: d.sid || "", publicKey: d.pbk || "" };
+
+                return { protocol: "vmess", settings: { vnext: [{ address: d.add, port: parseInt(d.port), users: [{ id: d.id, alterId: parseInt(d.aid) || 0, security: "auto" }] }] }, tag, streamSettings: stream };
+            } catch (e) { throw new Error('VMess Parse Error'); }
+        }
+
+        function parseTrojanConfig(s, tag) {
+            try {
+                const url = new URL(s);
+                const p = new URLSearchParams(url.search);
+                const sec = p.get('security') || "tls", net = p.get('type') || "tcp";
+                let stream = { network: net, security: sec };
+                if (net === "tcp") {
+                    stream.tcpSettings = { header: { type: p.get('headerType') || "none" } };
+                    if (p.get('headerType') === "http") stream.tcpSettings.header.request = { headers: { Host: [p.get('host') || ""] }, path: [p.get('path') || "/"] };
+                } else if (net === "ws") stream.wsSettings = { path: p.get('path') || "/", headers: { Host: p.get('host') || "" } };
+                else if (net === "grpc") stream.grpcSettings = { serviceName: p.get('serviceName') || "" };
+                else if (net === "httpupgrade") stream.httpupgradeSettings = { path: p.get('path') || "/", host: p.get('host') || "" };
+                else if (net === "xhttp") stream.xhttpSettings = { path: p.get('path') || "/", host: p.get('host') || "/", mode: p.get('mode') || "auto" };
+                else if (net === "mkcp") stream.kcpSettings = { header: { type: p.get('headerType') || "none" } };
+
+                if (sec === "tls") stream.tlsSettings = { serverName: p.get('sni') || url.hostname, alpn: p.get('alpn') ? p.get('alpn').split(',') : [] };
+                else if (sec === "reality") stream.realitySettings = { serverName: p.get('sni') || "", fingerprint: p.get('fp') || "chrome", shortId: p.get('sid') || "", publicKey: p.get('pbk') || "", spiderX: p.get('spx') || "" };
+
+                return { protocol: "trojan", settings: { servers: [{ address: url.hostname, port: parseInt(url.port), password: url.username }] }, tag, streamSettings: stream };
+            } catch (e) { throw new Error('Trojan Parse Error'); }
+        }
+
+        function normalizeSSMethod(m) {
+            let n = m.toLowerCase().replace(/_/g, '-');
+            if (n.startsWith('blake3-')) n = '2022-' + n;
+            return n;
+        }
+
+        function parseSSConfig(s, tag) {
+            try {
+                let url, searchParams, m, p, h, prt;
+                if (s.includes('@')) {
+                    url = new URL(s);
+                    searchParams = new URLSearchParams(url.search);
+                    let info = url.username;
+                    try { info = atob(info); } catch (e) { }
+                    const parts = info.split(':');
+                    m = normalizeSSMethod(parts[0] || "");
+                    p = parts[1] || "";
+                    if (parts[2]) p += ":" + parts[2];
+                    h = url.hostname;
+                    prt = parseInt(url.port) || 443;
+                } else {
+                    const [base, hash] = s.split('#');
+                    const [main, search] = base.split('?');
+                    const decoded = atob(main.replace('ss://', ''));
+                    const [methodPass, hostPort] = decoded.split('@');
+                    const parts = methodPass.split(':');
+                    m = normalizeSSMethod(parts[0] || "");
+                    p = parts[1] || "";
+                    if (parts[2]) p += ":" + parts[2];
+                    const [host, port] = hostPort.split(':');
+                    h = host;
+                    prt = parseInt(port) || 443;
+                    searchParams = new URLSearchParams(search || "");
                 }
-            }
+
+                let server = { address: h, port: prt, method: m, password: p };
+                let res = { protocol: "shadowsocks", settings: { servers: [server] }, tag };
+
+                const net = searchParams.get('type') || "tcp";
+                const sec = searchParams.get('security') || "none";
+                if (net !== "tcp" || sec !== "none") {
+                    res.streamSettings = { network: net, security: sec };
+                    if (sec === "tls") {
+                        res.streamSettings.tlsSettings = { serverName: searchParams.get('sni') || h, alpn: searchParams.get('alpn') ? searchParams.get('alpn').split(',') : [] };
+                    } else if (sec === "reality") {
+                        res.streamSettings.realitySettings = { serverName: searchParams.get('sni') || "", fingerprint: searchParams.get('fp') || "chrome", shortId: searchParams.get('sid') || "", publicKey: searchParams.get('pbk') || "", spiderX: searchParams.get('spx') || "" };
+                    }
+                    if (net === "ws") res.streamSettings.wsSettings = { path: searchParams.get('path') || "/", headers: { Host: searchParams.get('host') || "" } };
+                    else if (net === "grpc") res.streamSettings.grpcSettings = { serviceName: searchParams.get('serviceName') || "" };
+                    else if (net === "httpupgrade") res.streamSettings.httpupgradeSettings = { path: searchParams.get('path') || "/", host: searchParams.get('host') || "" };
+                    else if (net === "xhttp") res.streamSettings.xhttpSettings = { path: searchParams.get('path') || "/", host: searchParams.get('host') || "/", mode: searchParams.get('mode') || "auto" };
+                    else if (net === "mkcp") res.streamSettings.kcpSettings = { header: { type: searchParams.get('headerType') || "none" } };
+                    else if (net === "tcp") {
+                        res.streamSettings.tcpSettings = { header: { type: searchParams.get('headerType') || "none" } };
+                        if (searchParams.get('headerType') === 'http') res.streamSettings.tcpSettings.header.request = { headers: { Host: [searchParams.get('host') || ""] }, path: [searchParams.get('path') || "/"] };
+                    }
+                }
+                return res;
+            } catch (e) { throw new Error('Shadowsocks Parse Error'); }
+        }
+
+        function parseWireGuardConfig(s, tag) {
+            try {
+                if (s.includes('[Interface]')) {
+                    const lines = s.split('\n');
+                    let priv = "", pub = "", pre = "", endpoint = "", ip = "10.0.0.2/32", mtu = 1420, reserved = undefined;
+
+                    lines.forEach(line => {
+                        const idx = line.indexOf('=');
+                        if (idx === -1) return;
+                        const key = line.substring(0, idx).trim().toLowerCase();
+                        const val = line.substring(idx + 1).split('#')[0].trim();
+
+                        if (key === 'privatekey') priv = val;
+                        else if (key === 'address') ip = val;
+                        else if (key === 'publickey') pub = val;
+                        else if (key === 'endpoint') endpoint = val;
+                        else if (key === 'presharedkey') pre = val;
+                        else if (key === 'mtu') mtu = parseInt(val) || 1420;
+                    });
+
+                    let peer = { publicKey: pub, endpoint: endpoint };
+                    if (pre) peer.preSharedKey = pre;
+
+                    return {
+                        protocol: "wireguard",
+                        settings: {
+                            secretKey: priv,
+                            address: ip.includes(',') ? ip.split(',').map(v => v.trim()) : [ip],
+                            peers: [peer],
+                            mtu: mtu,
+                            reserved: reserved
+                        },
+                        tag
+                    };
+                } else {
+                    const url = new URL(s);
+                    const p = new URLSearchParams(url.search);
+                    const priv = p.get('privateKey') || p.get('private_key') || decodeURIComponent(url.username) || "";
+                    const pub = p.get('publicKey') || p.get('public_key') || p.get('publickey') || "";
+                    const pre = p.get('presharedKey') || p.get('preshared_key') || p.get('presharedkey') || undefined;
+                    const ip = p.get('ip') || p.get('address') || "10.0.0.2/32";
+
+                    let peer = { publicKey: pub, endpoint: `${url.hostname}:${url.port}` };
+                    if (pre) peer.preSharedKey = pre;
+
+                    return {
+                        protocol: "wireguard",
+                        settings: {
+                            secretKey: priv,
+                            address: ip.includes(',') ? ip.split(',').map(v => v.trim()) : [ip],
+                            peers: [peer],
+                            mtu: parseInt(p.get('mtu')) || 1420,
+                            reserved: p.get('reserved') ? p.get('reserved').split(',').map(Number) : undefined
+                        },
+                        tag
+                    };
+                }
+            } catch (e) { throw new Error('WireGuard Parse Error'); }
         }
     </script>
 </body>
+
 </html>
